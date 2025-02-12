@@ -1,7 +1,7 @@
 ---
 date: 2024-12-22
 duration: "2:39:59"
-title: "Tech News & AMA #34"
+title: "Tech News & AMA #35"
 tags: ["AMA"]
 category: "ama"
 youtube: https://www.youtube.com/watch?v=M7B_-rV_LmM
