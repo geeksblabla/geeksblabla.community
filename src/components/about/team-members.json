@@ -183,6 +183,13 @@
     },
     {
         "id": 31,
+        "name": "Achraf Hardizi",
+        "link": "https://www.linkedin.com/in/achrafhardizi/",
+        "profile_image": "/about/images/team/hardizi.jpg",
+        "status": "active"
+    },
+    {
+        "id": 32,
         "name": "You",
         "link": "https://tally.so/r/meqj6E",
         "profile_image": "/about/images/team/wewantu.jpg",
