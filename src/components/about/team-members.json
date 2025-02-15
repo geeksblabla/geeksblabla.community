@@ -70,6 +70,13 @@
         "status": "active"
     },
     {
+        "id": 11,
+        "name": "Amine RACHYD",
+        "link": "https://x.com/RachydAmine",
+        "profile_image": "/about/images/team/rachyd.jpg",
+        "status": "active"
+    },
+    {
         "id": 13,
         "name": "Soufyan El Foukahi",
         "link": "https://x.com/soufyanAI",
