@@ -7,6 +7,8 @@ import remarkCollapse from "remark-collapse";
 import sitemap from "@astrojs/sitemap";
 import { SITE } from "./src/config";
 
+import rehypeExternalLinks from "rehype-external-links";
+
 import mdx from "@astrojs/mdx";
 import pagefind from "astro-pagefind";
 import netlify from "@astrojs/netlify";
@@ -44,6 +46,16 @@ export default defineConfig({
   ],
 
   markdown: {
+    rehypePlugins: [
+      [
+        rehypeExternalLinks,
+        {
+          target: "_blank",
+          rel: ["noopener", "noreferrer"],
+          internal: true
+        },
+      ],
+    ],
     remarkPlugins: [
       remarkToc,
       [
