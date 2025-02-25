@@ -190,6 +190,13 @@
     },
     {
         "id": 32,
+        "name": "Sanaa Harmach",
+        "link": "https://www.linkedin.com/in/sanaaaharmach/",
+        "profile_image": "./images/sanaa.jpg",
+        "status": "active"
+    },
+    {
+        "id": 33,
         "name": "You",
         "link": "https://tally.so/r/meqj6E",
         "profile_image": "./images/wewantu.jpg",
