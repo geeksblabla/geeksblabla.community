@@ -4,15 +4,10 @@ import Header from "../header.astro";
 import { Icon } from "astro-icon/components";
 import HeroAnimation from "./hero-animation.astro";
 import { getCollection } from "astro:content";
-import {
-  getLastEpisode,
-  getLastFeaturedEpisode as getRandomEpisode,
-} from "@/lib/podcast-utils";
+import { getLastEpisode } from "@/lib/podcast-utils";
 
 const podcast = await getCollection("podcast");
 const lastEpisode = getLastEpisode(podcast);
-
-const lastFeaturedEpisode = getRandomEpisode(podcast);
 ---
 
 <section class="relative overflow-hidden bg-[#D4E3DE]">
@@ -58,10 +53,10 @@ const lastFeaturedEpisode = getRandomEpisode(podcast);
           </ButtonLink>
           <ButtonLink
             variant="outline"
-            href={`/podcast/${lastFeaturedEpisode.data.slug}`}
+            href="/podcast/planning"
             className="motion-preset-slide-down hidden self-center motion-delay-[1000ms] md:flex"
           >
-            Surprise me <Icon name="arrow-right" class="ml-2" />
+            Check Planning <Icon name="arrow-right" class="ml-2" />
           </ButtonLink>
         </div>
       </div>
@@ -76,7 +71,8 @@ const lastFeaturedEpisode = getRandomEpisode(podcast);
 
 <style>
   .bg-grid-pattern {
-    background-image: linear-gradient(to right, #636161 1px, transparent 1px),
+    background-image:
+      linear-gradient(to right, #636161 1px, transparent 1px),
       linear-gradient(to bottom, #636161 1px, transparent 1px);
     background-size: 100px 100px; /* Smaller squares for mobile screens */
     animation: move-grid 8s linear infinite 2s;
