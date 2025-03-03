@@ -197,6 +197,13 @@
     },
     {
         "id": 33,
+        "name": "Oumaima Mhiriz",
+        "link": "https://www.linkedin.com/in/oumaima-mhiriz/",
+        "profile_image": "./images/mhiriz.jpg",
+        "status": "active"
+    },
+    {
+        "id": 34,
         "name": "You",
         "link": "https://tally.so/r/meqj6E",
         "profile_image": "./images/wewantu.jpg",
