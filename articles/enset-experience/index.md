@@ -13,10 +13,6 @@ When I first considered joining an IT club, I had so many doubts. _Should I even
 
 All these questions were running through my mind after I finished my first year of the _cycle d'ingénieur at ENEST Mohammedia_. But looking back, I realize now that all of these concerns stemmed from one thing: **Fear**
 
-When I first considered joining an IT club, I had so many doubts. _Should I even join?_ I already study computer science—wouldn't it be better to join a club that focuses on soft skills, like public speaking? If I joined an IT club, wouldn’t I just be doing more of the same thing? On top of that, I barely kept up with my studies in my first year. Would I even be able to handle the extra workload? Would it just be a waste of time?
-
-All these questions were running through my mind after I finished my first year of the _cycle d'ingénieur at ENEST Mohammedia_. But looking back, I realize now that all of these concerns stemmed from one thing: **Fear**.
-
 ## A Little About Me
 
 Hi everyone, I'm Achraf Hardizi, a second-year student in Software Engineering and Cybersecurity at ENSET Mohammedia. I’m also the Co-Lead of the **Google Developer Group on Campus** at ENSET. _Wait—where’s the fear you just talked about?_ Don't worry, I wrote this blog for everyone who's been in the same situation as I was and also to show the power of **Clubs**.
@@ -102,7 +98,7 @@ As part of our online presence, we integrated an existing project started last y
 
 The idea behind The ENSET Podcast was simple yet powerful: **connect students with industry experts**. Through interviews, we created a bridge between **experienced professionals and students**, allowing them to gain insights, ask questions, and learn from real-world experiences. To keep this initiative alive and strengthen its impact, we collaborated with the original team to make **The ENSET Podcast a true ENSET brand**.
 
-Since the start of the \***\*Podcast**,\*\* we’ve covered several insightful topics, including:
+Since the start of the Podcast, we’ve covered several insightful topics, including:
 
 - **Web Development with Astro** – Featuring guest **Elian Van Cutsem**, who shared his knowledge on modern web frameworks.
 - **Engineers in Action** – A session featuring **ENSET alumnae** now working in the tech industry. They shared their experiences and encouraged more female students to join **competitions and clubs**, reinforcing the message that **tech is for everyone, regardless of gender**.
