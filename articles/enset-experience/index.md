@@ -1,5 +1,5 @@
 ---
-title: "ENSET Experience"
+title: "The ENSET Experience"
 tags: ["community", "enset", "hackathons", "clubs"]
 keywords: ["community", "gdg", "enset"]
 pubDatetime: 2025-04-04
@@ -17,13 +17,13 @@ When I first considered joining an IT club, I had so many doubts. _Should I even
 
 All these questions were running through my mind after I finished my first year of the _cycle d'ingénieur at ENEST Mohammedia_. But looking back, I realize now that all of these concerns stemmed from one thing: **Fear**.
 
-# A Little About Me
+## A Little About Me
 
 Hi everyone, I'm Achraf Hardizi, a second-year student in Software Engineering and Cybersecurity at ENSET Mohammedia. I’m also the Co-Lead of the **Google Developer Group on Campus** at ENSET. _Wait—where’s the fear you just talked about?_ Don't worry, I wrote this blog for everyone who's been in the same situation as I was and also to show the power of **Clubs**.
 
 I know my doubts weren’t unique—many of our club members faced the same hesitation before joining. That’s why I want to share my journey and highlight the importance of joining a club. If you’re a student, getting involved in a club can be a **life-changing experience**. It has taught me so much, shaped my perspective, and turned me from someone hesitant and unsure into someone more confident and engaged.
 
-# How It All Started
+## How It All Started
 
 During the summer, I was doing an internship in Fes alongside my friend **Hamza El Ghazouani**, who was incredibly excited about becoming the president of our **GDG on Campus** club. (It was previously called **Google Developer Student Club (GDSC)** before Google changed the name.)
 
@@ -35,7 +35,7 @@ That’s when I made my decision. _Trying wouldn’t hurt_, and if things didn�
 
 And that’s when everything changed.
 
-# Setting Up for Success
+## Setting Up for Success
 
 During our internship, Hamza and I focused on **two key strategies** to make this year different from previous ones:
 
@@ -48,7 +48,7 @@ Before the academic year even started—especially before _Journée d’Intégra
 
 And it worked. In just a few days, our reels gained more traction than anything the club had done in previous years. First-year students started reaching out, eager to learn more and **excited to join us**.
 
-# Kicking Off Our First Contact with Students
+## Kicking Off Our First Contact with Students
 
 ![Kickoff](./images/kickoffpng.png)
 
@@ -56,7 +56,7 @@ During _Journée d’Intégration_, all clubs at ENSET are expected to host a **
 
 I had the responsibility of **hosting the event**, and it was my first time being _"on stage"_ in front of an audience. At first, the thought of speaking in front of so many people was intimidating. But once I realized that the audience was there because they genuinely wanted to learn about our club, everything changed. They weren’t there to judge me; they were there because they believed we had **something valuable to share**. From that moment, speaking became more natural—I simply had to be myself and talk about my experience.
 
-# Our Main Activities
+## Our Main Activities
 
 At the kickoff, we introduced several key initiatives that would shape our club’s direction:
 
@@ -68,7 +68,7 @@ We wrapped up the kickoff with some fun activities and icebreaker games, giving 
 
 Our kickoff event didn’t just capture the attention of students—it also inspired **other clubs**. For example, **ENSPEC** (ENSET’s English-speaking club) expanded on our idea, using a similar approach to promote **public speaking**. This showed us that the impact of our club could extend beyond just IT and into other domains. For more infos on events you can check [our website](https://gdg.community.dev/gdg-on-campus-enset-ecole-normale-superieure-de-lenseignement-technique-de-mohammedia-mohammedia-morocco/) it contains all upcoming events
 
-# The Start of Club Activities
+## The Start of Club Activities
 
 With our vision set, we jumped straight into action. One of our biggest priorities was **encouraging club members to share their knowledge**. Rather than just bringing in external speakers, we motivated our own students to **explain IT concepts**, making the sessions feel more **authentic and relatable**.
 
@@ -94,7 +94,7 @@ We also made a conscious effort to **keep our topics advanced and engaging**. In
 
 To ensure we reached **everyone**, we didn’t limit our activities to just in-person events. We embraced **online content**, allowing us to **expand beyond ENSET** and share valuable insights with a wider audience. This led to the birth of **The ENSET Podcast.**
 
-# [The ENSET Podcast 🔗](https://www.youtube.com/@the_enset_podcast) — A Platform for Knowledge Sharing
+## [The ENSET Podcast 🔗](https://www.youtube.com/@the_enset_podcast) — A Platform for Knowledge Sharing
 
 ![The ENSET Podcast Channel](./images/n7_podcast.png)
 
@@ -112,7 +112,7 @@ Managing The ENSET Podcast hasn’t been easy—we’ve faced technical, schedul
 
 Want to check out our episodes? [The ENSET Podcast Youtube Channel 🔗](https://www.youtube.com/@the_enset_podcast)
 
-# Competitions
+## Competitions
 
 One of our main objectives at GDG ENSET was to **encourage students to step out of their comfort zones** and **showcase their talents** by participating in competitions. Whether it was **hackathons, competitive programming, or cybersecurity challenges**, our message was clear:
 
@@ -141,7 +141,7 @@ Our vision was to **build a culture of participation and competitiveness**, wher
 
 🏆 **Winning is great, but the true value lies in networking, learning new technologies, and pushing yourself beyond your limits.**
 
-# [BlaBlaConf 5.0](https://blablaconf.com/): Overcoming Doubts & Taking the Stage
+## [BlaBlaConf 5.0](https://blablaconf.com/): Overcoming Doubts & Taking the Stage
 
 ![Our participation in BlaBlaConf 5.0](./images/blabla_gdg.png)
 
@@ -159,7 +159,7 @@ The **UX, Web & Mobile track** on the first day was **dominated by ENSET student
 
 We all have something valuable to share—it’s often **self-doubt** that holds us back. **Stepping out of our comfort zones unlocks opportunities we never imagined possible.** BlaBlaConf 5.0 wasn’t just a conference; it was a **reminder that growth happens when we take risks and put ourselves out there**. 🚀
 
-# Conclusion: The Power of Community
+## Conclusion: The Power of Community
 
 Looking back on my journey with GDG on Campus, I can confidently say that joining this club was one of the most transformative experiences of my academic life. It wasn’t just about organizing events or learning new technologies—it was about growth, connections, and impact.
 
