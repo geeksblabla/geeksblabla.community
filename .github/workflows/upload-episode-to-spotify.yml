@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload Episode from YouTube To Spotify
         if: steps.check-file.outputs.exists == 'true'
-        uses: yjose/youtube-to-spotify@feat-cookies
+        uses: yjose/youtube-to-spotify@2.6.0
         env:
           SPOTIFY_EMAIL: ${{ secrets.ANCHOR_EMAIL }}
           SPOTIFY_PASSWORD: ${{ secrets.ANCHOR_PASSWORD }}
