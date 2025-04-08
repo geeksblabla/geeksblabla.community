@@ -36,11 +36,11 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Setup yt-dlp YouTube cookies
-        uses: AnimMouse/setup-yt-dlp/cookies@v3
-        with:
-          cookies: ${{ secrets.YOUTUBE_COOKIES }}
-          enable: false
+      # - name: Setup yt-dlp YouTube cookies
+      #   uses: AnimMouse/setup-yt-dlp/cookies@v3
+      #   with:
+      #     cookies: ${{ secrets.YOUTUBE_COOKIES }}
+      #     enable: false
 
       - name: Upload Episode from YouTube To Spotify
         if: steps.check-file.outputs.exists == 'true'
@@ -49,7 +49,7 @@ jobs:
           SPOTIFY_EMAIL: ${{ secrets.ANCHOR_EMAIL }}
           SPOTIFY_PASSWORD: ${{ secrets.ANCHOR_PASSWORD }}
           EPISODE_PATH: /github/workspace
-          COOKIES_FILE: "~/.cache/yt-dlp/youtube/cookies.txt"
+          COOKIES_FILE: ${{ secrets.YOUTUBE_COOKIES }}
           SAVE_AS_DRAFT: true
           LOAD_THUMBNAIL: true
           URL_IN_DESCRIPTION: true
