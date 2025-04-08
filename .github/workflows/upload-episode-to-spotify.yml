@@ -6,13 +6,50 @@ on:
     branches:
       - master
       - fix/fix-youtube-to-spotify
-    # paths:
-    #   - "episodes/**.md"
+    paths:
+      - "episodes/**.md"
 
 jobs:
-  upload-episode:
+  check-missed-episode:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      has_missed_episode: ${{ steps.check-file.outputs.exists }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node + PNPM + install deps
+        uses: ./.github/actions/setup-node-pnpm-install
+
+      - name: Get missed episode + generate youtube id file missed-episode.json
+        id: missed-episode
+        run: |
+          node ./.github/scripts/get-missed-episode.js
+
+      - name: Check if missed episode exists
+        id: check-file
+        run: |
+          if [ -f "missed-episode.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload missed-episode.json as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: missed-episode
+          path: missed-episode.json
+          if-no-files-found: ignore
+
+  upload-episode:
+    needs: check-missed-episode
+    if: needs.check-missed-episode.outputs.has_missed_episode == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
     permissions:
       contents: write
 
@@ -20,28 +57,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: 📦 Setup Node + PNPM + install deps
-      #   uses: ./.github/actions/setup-node-pnpm-install
-
-      # - name: Get missed episode + generate youtube id file missed-episode.json
-      #   id: missed-episode
-      #   run: |
-      #     node ./.github/scripts/get-missed-episode.js
-
-      # - name: Check if missed episode exists
-      #   id: check-file
-      #   run: |
-      #     if [ -f "missed-episode.json" ]; then
-      #       echo "exists=true" >> $GITHUB_OUTPUT
-      #     else
-      #       echo "exists=false" >> $GITHUB_OUTPUT
-      #     fi
-
-      # - name: Setup yt-dlp YouTube cookies
-      #   uses: AnimMouse/setup-yt-dlp/cookies@v3
-      #   with:
-      #     cookies: ${{ secrets.YOUTUBE_COOKIES }}
-      #     enable: false
+      - name: Download missed-episode.json artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: missed-episode
+          path: .
 
       - name: Upload Episode from YouTube To Spotify
         uses: yjose/youtube-to-spotify@feat-cookies
@@ -51,6 +71,5 @@ jobs:
           EPISODE_PATH: /github/workspace
           COOKIES_FILE: ${{ secrets.YOUTUBE_COOKIES }}
           SAVE_AS_DRAFT: true
-          # LOAD_THUMBNAIL: true
-          # URL_IN_DESCRIPTION: true
+          LOAD_THUMBNAIL: true
           EPISODE_FILE: missed-episode.json
