@@ -44,12 +44,12 @@ jobs:
 
       - name: Upload Episode from YouTube To Spotify
         if: steps.check-file.outputs.exists == 'true'
-        uses: Schroedinger-Hat/youtube-to-spotify@v2.5.0
+        uses: yjose/youtube-to-spotify@feat-cookies
         env:
           SPOTIFY_EMAIL: ${{ secrets.ANCHOR_EMAIL }}
           SPOTIFY_PASSWORD: ${{ secrets.ANCHOR_PASSWORD }}
           EPISODE_PATH: /github/workspace
-          # COOKIES_FILE: "~/.cache/yt-dlp/youtube/cookies.txt"
+          COOKIES_FILE: "~/.cache/yt-dlp/youtube/cookies.txt"
           SAVE_AS_DRAFT: true
           LOAD_THUMBNAIL: true
           URL_IN_DESCRIPTION: true
