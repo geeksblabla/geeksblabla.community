@@ -6,8 +6,8 @@ on:
     branches:
       - master
       - fix/fix-youtube-to-spotify
-    # paths:
-    #   - "episodes/**.md"
+    paths:
+      - "episodes/**.md"
 
 jobs:
   check-missed-episode:
