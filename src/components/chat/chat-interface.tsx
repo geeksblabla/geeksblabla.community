@@ -1,6 +1,8 @@
 import { useChat } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+import { useEffect, useState } from "react";
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
 const components: Components = {
   a: ({ ...props }) => (
@@ -27,11 +29,84 @@ const components: Components = {
   ),
 };
 
+// Storage key for visitor ID
+const VISITOR_ID_KEY = "geeksblabla_visitor_id";
+
 export default function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
+  const [visitorId, setVisitorId] = useState<string>("");
+  const [isFingerprintLoading, setIsFingerprintLoading] = useState(true);
+
+  // Initialize FingerprintJS
+  useEffect(() => {
+    const initFingerprint = async () => {
+      try {
+        // Check if we already have a visitor ID in localStorage
+        const storedId = localStorage.getItem(VISITOR_ID_KEY);
+        if (storedId) {
+          setVisitorId(storedId);
+          setIsFingerprintLoading(false);
+          return;
+        }
+
+        // If not, get a new one from FingerprintJS
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        const newVisitorId = result.visitorId;
+
+        // Store it in localStorage
+        localStorage.setItem(VISITOR_ID_KEY, newVisitorId);
+        setVisitorId(newVisitorId);
+      } catch {
+        // Fallback to a random ID if fingerprinting fails
+        const fallbackId = `client-${Math.random().toString(36).substring(7)}`;
+        localStorage.setItem(VISITOR_ID_KEY, fallbackId);
+        setVisitorId(fallbackId);
+      } finally {
+        setIsFingerprintLoading(false);
+      }
+    };
+
+    initFingerprint();
+
+    // Listen for storage changes (in case another tab updates the ID)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === VISITOR_ID_KEY && e.newValue) {
+        setVisitorId(e.newValue);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       api: "/api/chat",
+      headers: {
+        "X-Visitor-ID": visitorId,
+      },
     });
+
+  if (isFingerprintLoading) {
+    return (
+      <div className="flex h-[600px] items-center justify-center bg-gray-50">
+        <div className="flex gap-1">
+          <div
+            className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+            style={{ animationDelay: "0ms" }}
+          ></div>
+          <div
+            className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+            style={{ animationDelay: "150ms" }}
+          ></div>
+          <div
+            className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+            style={{ animationDelay: "300ms" }}
+          ></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[600px] flex-col bg-gray-50">
@@ -72,7 +147,6 @@ export default function ChatInterface() {
             </div>
           </div>
         )}
-        {error && <div className="text-red-500">Error: {error.message}</div>}
       </div>
 
       <div className="border-t bg-white p-4">
