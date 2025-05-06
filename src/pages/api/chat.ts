@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { getRelevantDocuments } from "../../lib/embeddings";
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
-import { isRateLimited } from "../../lib/rate-limiter";
+import { isRateLimited, isValidVisitorId } from "../../lib/rate-limiter";
 
 export const runtime = "edge";
 export const prerender = false;
@@ -10,24 +10,45 @@ export const prerender = false;
 // Mark this route as server-side only
 export const partial = true;
 
+// Helper function to verify a signed visitor ID
+function verifyVisitorId(signedId: string): { id: string; isValid: boolean } {
+  try {
+    const [id, timestamp, signature] = signedId.split(".");
+    const data = `${id}:${timestamp}:${import.meta.env.PUBLIC_SIGNATURE_SECRET}`;
+    const expectedSignature = btoa(unescape(encodeURIComponent(data)));
+    const isValid = signature === expectedSignature;
+    return { id, isValid };
+  } catch {
+    return { id: "", isValid: false };
+  }
+}
+
 // Helper function to get client identifier from header
-function getClientId(request: Request): string {
+async function getClientId(request: Request): Promise<string> {
   const visitorId = request.headers.get("X-Visitor-ID");
   if (!visitorId) {
     throw new Error(
       "Missing visitor ID. Please refresh the page and try again."
     );
   }
-  // Validate visitor ID format
-  if (
-    !visitorId.startsWith("client-") &&
-    !visitorId.match(/^[a-zA-Z0-9-_]{20,}$/)
-  ) {
+
+  // Verify the signed visitor ID
+  const { id, isValid } = verifyVisitorId(visitorId);
+  if (!isValid) {
+    throw new Error(
+      "Invalid visitor ID signature. Please refresh the page and try again."
+    );
+  }
+
+  // Validate visitor ID exists in Redis
+  const isValidInRedis = await isValidVisitorId(id);
+  if (!isValidInRedis) {
     throw new Error(
       "Invalid visitor ID. Please refresh the page and try again."
     );
   }
-  return visitorId;
+
+  return id;
 }
 
 // Create a stream compatible with AI SDK's format
@@ -135,7 +156,7 @@ Based *only* on the English context provided above from our podcast episodes, pl
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Get client identifier from header and validate it
-    const clientId = getClientId(request);
+    const clientId = await getClientId(request);
 
     // Check rate limit
     const { limited, remainingTime } = await isRateLimited(clientId);
@@ -179,19 +200,29 @@ export const POST: APIRoute = async ({ request }) => {
     };
 
     // Stream OpenAI response
-    const result = await streamText({
-      model: openai(import.meta.env.OPENAI_CHAT_MODEL || "gpt-4"),
-      messages: [systemMessage, ...messages],
-      temperature: 0.7,
-      maxTokens: 1000,
-    });
+    try {
+      const result = await streamText({
+        model: openai(import.meta.env.OPENAI_CHAT_MODEL || "gpt-4"),
+        messages: [systemMessage, ...messages],
+        temperature: 0.7,
+        maxTokens: 1000,
+      });
 
-    // Return stream compatible with AI SDK format
-    return result.toDataStreamResponse();
+      // Return stream compatible with AI SDK format
+      return result.toDataStreamResponse();
+    } catch (error) {
+      console.error("OpenAI API error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to get response from AI. Please try again.";
+      return createTextStream(`**Error:** ${errorMessage}`);
+    }
   } catch (error) {
     // Use AI SDK compatible stream for error message
+    console.error("Chat API error:", error);
     return createTextStream(
-      error instanceof Error ? error.message : "An unexpected error occurred"
+      `**Error:** ${error instanceof Error ? error.message : "An unexpected error occurred"}`
     );
   }
 };

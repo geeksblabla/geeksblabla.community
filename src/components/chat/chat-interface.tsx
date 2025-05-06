@@ -31,36 +31,85 @@ const components: Components = {
 
 // Storage key for visitor ID
 const VISITOR_ID_KEY = "geeksblabla_visitor_id";
+const SIGNATURE_SECRET =
+  import.meta.env.PUBLIC_SIGNATURE_SECRET || "default-secret";
+
+// Helper function to sign a visitor ID
+function signVisitorId(id: string): string {
+  const timestamp = Date.now();
+  const data = `${id}:${timestamp}:${SIGNATURE_SECRET}`;
+  const signature = btoa(unescape(encodeURIComponent(data)));
+  return `${id}.${timestamp}.${signature}`;
+}
+
+// Helper function to verify a signed visitor ID
+function verifyVisitorId(signedId: string): { id: string; isValid: boolean } {
+  try {
+    const [id, timestamp, signature] = signedId.split(".");
+    const data = `${id}:${timestamp}:${SIGNATURE_SECRET}`;
+    const expectedSignature = btoa(unescape(encodeURIComponent(data)));
+    const isValid = signature === expectedSignature;
+    return { id, isValid };
+  } catch {
+    return { id: "", isValid: false };
+  }
+}
+
+// Helper function to store visitor ID in Redis
+async function storeVisitorId(visitorId: string): Promise<void> {
+  try {
+    const signedId = signVisitorId(visitorId);
+    const response = await fetch("/api/store-visitor", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ visitorId: signedId }),
+    });
+
+    if (!response.ok) {
+      await response.json();
+    }
+  } catch {
+    // Don't throw the error - we want the chat to work even if storage fails
+    // The rate limiter will handle invalid IDs appropriately
+  }
+}
 
 export default function ChatInterface() {
-  const [visitorId, setVisitorId] = useState<string>("");
+  const [signedVisitorId, setSignedVisitorId] = useState<string>("");
   const [isFingerprintLoading, setIsFingerprintLoading] = useState(true);
 
-  // Initialize FingerprintJS
   useEffect(() => {
     const initFingerprint = async () => {
       try {
-        // Check if we already have a visitor ID in localStorage
         const storedId = localStorage.getItem(VISITOR_ID_KEY);
         if (storedId) {
-          setVisitorId(storedId);
-          setIsFingerprintLoading(false);
-          return;
+          const { id, isValid } = verifyVisitorId(storedId);
+          if (isValid) {
+            await storeVisitorId(id);
+            setSignedVisitorId(storedId);
+            setIsFingerprintLoading(false);
+            return;
+          }
+          localStorage.removeItem(VISITOR_ID_KEY);
         }
 
-        // If not, get a new one from FingerprintJS
         const fp = await FingerprintJS.load();
         const result = await fp.get();
         const newVisitorId = result.visitorId;
 
-        // Store it in localStorage
-        localStorage.setItem(VISITOR_ID_KEY, newVisitorId);
-        setVisitorId(newVisitorId);
+        const signedId = signVisitorId(newVisitorId);
+        localStorage.setItem(VISITOR_ID_KEY, signedId);
+
+        await storeVisitorId(newVisitorId);
+        setSignedVisitorId(signedId);
       } catch {
-        // Fallback to a random ID if fingerprinting fails
         const fallbackId = `client-${Math.random().toString(36).substring(7)}`;
-        localStorage.setItem(VISITOR_ID_KEY, fallbackId);
-        setVisitorId(fallbackId);
+        const signedFallbackId = signVisitorId(fallbackId);
+        localStorage.setItem(VISITOR_ID_KEY, signedFallbackId);
+        await storeVisitorId(fallbackId);
+        setSignedVisitorId(signedFallbackId);
       } finally {
         setIsFingerprintLoading(false);
       }
@@ -68,10 +117,13 @@ export default function ChatInterface() {
 
     initFingerprint();
 
-    // Listen for storage changes (in case another tab updates the ID)
-    const handleStorageChange = (e: StorageEvent) => {
+    const handleStorageChange = async (e: StorageEvent) => {
       if (e.key === VISITOR_ID_KEY && e.newValue) {
-        setVisitorId(e.newValue);
+        const { id, isValid } = verifyVisitorId(e.newValue);
+        if (isValid) {
+          await storeVisitorId(id);
+          setSignedVisitorId(e.newValue);
+        }
       }
     };
 
@@ -79,11 +131,11 @@ export default function ChatInterface() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
     useChat({
       api: "/api/chat",
       headers: {
-        "X-Visitor-ID": visitorId,
+        "X-Visitor-ID": signedVisitorId,
       },
     });
 
@@ -127,6 +179,15 @@ export default function ChatInterface() {
             </div>
           </div>
         ))}
+        {error && (
+          <div className="animate-fade-in flex justify-start">
+            <div className="max-w-[70%] rounded-2xl rounded-tl-sm bg-red-50 p-3 text-red-600 shadow-sm">
+              <ReactMarkdown components={components}>
+                {error.message}
+              </ReactMarkdown>
+            </div>
+          </div>
+        )}
         {isLoading && (
           <div className="animate-fade-in flex justify-start">
             <div className="flex max-w-[80px] items-center gap-2 rounded-2xl rounded-tl-sm bg-gray-100 p-3 text-gray-800">

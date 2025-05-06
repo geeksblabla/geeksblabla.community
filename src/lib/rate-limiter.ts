@@ -17,6 +17,9 @@ const RATE_LIMIT_MAX_WAIT = parseInt(
 const RATE_LIMIT_VIOLATION_EXPIRY = parseInt(
   import.meta.env.RATE_LIMIT_VIOLATION_EXPIRY || "86400"
 ); // 24 hours in seconds
+const VISITOR_ID_EXPIRY = parseInt(
+  import.meta.env.VISITOR_ID_EXPIRY || "2592000"
+); // 30 days in seconds
 
 // Initialize rate limiter
 try {
@@ -46,6 +49,67 @@ try {
   });
 } catch {
   throw new Error("Rate limiter initialization failed");
+}
+
+// Helper function to store a valid visitor ID
+export async function storeVisitorId(visitorId: string): Promise<void> {
+  if (!redis) {
+    console.error("Redis not initialized when trying to store visitor ID");
+    throw new Error("Redis not initialized");
+  }
+
+  try {
+    console.log("Storing visitor ID in Redis:", visitorId);
+
+    // Use a transaction to ensure atomicity
+    const multi = redis.multi();
+
+    // Set the key with expiry
+    multi.set(`visitor:${visitorId}`, "1", { ex: VISITOR_ID_EXPIRY });
+
+    // Execute the transaction
+    await multi.exec();
+
+    // Verify the key exists and has the correct value
+    const value = await redis.get(`visitor:${visitorId}`);
+    // Redis returns numbers as numbers, so we need to compare with number 1
+    if (value !== 1) {
+      console.error(
+        "Failed to verify visitor ID storage:",
+        visitorId,
+        "value:",
+        value,
+        "type:",
+        typeof value
+      );
+      throw new Error("Failed to verify visitor ID storage");
+    }
+
+    console.log("Successfully stored and verified visitor ID in Redis");
+  } catch (error) {
+    console.error("Failed to store visitor ID in Redis:", error);
+    throw new Error("Failed to store visitor ID");
+  }
+}
+
+// Helper function to check if a visitor ID is valid
+export async function isValidVisitorId(visitorId: string): Promise<boolean> {
+  if (!redis) {
+    console.error("Redis not initialized when checking visitor ID");
+    return false;
+  }
+
+  try {
+    console.log("Checking visitor ID in Redis:", visitorId);
+    // Use EXISTS for more reliable checking
+    const exists = await redis.exists(`visitor:${visitorId}`);
+    const isValid = exists === 1;
+    console.log("Visitor ID check result:", isValid, "for ID:", visitorId);
+    return isValid;
+  } catch (error) {
+    console.error("Error checking visitor ID in Redis:", error);
+    return false;
+  }
 }
 
 // Helper function to get violation count
