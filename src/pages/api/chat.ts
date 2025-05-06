@@ -2,12 +2,93 @@ import type { APIRoute } from "astro";
 import { getRelevantDocuments } from "../../lib/embeddings";
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import { isRateLimited, isValidVisitorId } from "../../lib/rate-limiter";
 
 export const runtime = "edge";
 export const prerender = false;
 
 // Mark this route as server-side only
 export const partial = true;
+
+// Helper function to verify a signed visitor ID
+function verifyVisitorId(signedId: string): { id: string; isValid: boolean } {
+  try {
+    const [id, timestamp, signature] = signedId.split(".");
+    const data = `${id}:${timestamp}:${import.meta.env.PUBLIC_SIGNATURE_SECRET}`;
+    const expectedSignature = btoa(unescape(encodeURIComponent(data)));
+    const isValid = signature === expectedSignature;
+    return { id, isValid };
+  } catch {
+    return { id: "", isValid: false };
+  }
+}
+
+// Helper function to get client identifier from header
+async function getClientId(request: Request): Promise<string> {
+  const visitorId = request.headers.get("X-Visitor-ID");
+  if (!visitorId) {
+    throw new Error(
+      "Missing visitor ID. Please refresh the page and try again."
+    );
+  }
+
+  // Verify the signed visitor ID
+  const { id, isValid } = verifyVisitorId(visitorId);
+  if (!isValid) {
+    throw new Error(
+      "Invalid visitor ID signature. Please refresh the page and try again."
+    );
+  }
+
+  // Validate visitor ID exists in Redis
+  const isValidInRedis = await isValidVisitorId(id);
+  if (!isValidInRedis) {
+    throw new Error(
+      "Invalid visitor ID. Please refresh the page and try again."
+    );
+  }
+
+  return id;
+}
+
+// Create a stream compatible with AI SDK's format
+function createTextStream(text: string, delay: number = 20): Response {
+  let index = 0;
+  const chunkSize = 3; // Send 3 characters at a time
+
+  const stream = new ReadableStream({
+    start(controller) {
+      const encoder = new TextEncoder();
+
+      function pushChunk() {
+        if (index < text.length) {
+          // Get next chunk of characters
+          const chunk = text.slice(index, index + chunkSize);
+          index += chunkSize;
+
+          // Format as AI SDK stream with prefix 0 for text, properly JSON encoded
+          const encodedChunk = JSON.stringify(chunk);
+          controller.enqueue(encoder.encode(`0:${encodedChunk}\n`));
+          setTimeout(pushChunk, delay);
+        } else {
+          // End stream with empty line
+          controller.enqueue(encoder.encode("\n"));
+          controller.close();
+        }
+      }
+
+      pushChunk();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
+}
 
 const SYSTEM_PROMPT = `You are a knowledgeable software engineering expert and mentor, acting as a helpful assistant for the **Geeksblabla** podcast. Your primary goal is to share insights based **primarily** on the context provided from specific podcast episodes, but you can also engage in general conversation and offer broader expertise when appropriate.
 
@@ -74,6 +155,19 @@ Based *only* on the English context provided above from our podcast episodes, pl
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    // Get client identifier from header and validate it
+    const clientId = await getClientId(request);
+
+    // Check rate limit
+    const { limited, remainingTime } = await isRateLimited(clientId);
+
+    if (limited) {
+      const rateLimitMessage = `Fine Awa Ghadi!! I'm getting a lot of requests right now. Please try again in ${Math.ceil(remainingTime / 60)} minutes.`;
+
+      // Use AI SDK compatible stream for rate limit message
+      return createTextStream(rateLimitMessage);
+    }
+
     const { messages } = await request.json();
     const lastMessage = messages[messages.length - 1];
 
@@ -105,28 +199,30 @@ export const POST: APIRoute = async ({ request }) => {
       content: `${SYSTEM_PROMPT}\n\nContext from podcast episodes:\n${context}\n\nRemember to:\n1. Be concise and direct\n2. Include relevant YouTube links with timestamps\n3. Format links as markdown\n4. If you're not sure, say so`,
     };
 
-    // Use streamText with toDataStreamResponse for simpler streaming
-    const result = await streamText({
-      model: openai(import.meta.env.OPENAI_CHAT_MODEL || "gpt-4-turbo"),
-      messages: [systemMessage, ...messages],
-      temperature: 0.7,
-      maxTokens: 1000,
-    });
+    // Stream OpenAI response
+    try {
+      const result = await streamText({
+        model: openai(import.meta.env.OPENAI_CHAT_MODEL || "gpt-4"),
+        messages: [systemMessage, ...messages],
+        temperature: 0.7,
+        maxTokens: 1000,
+      });
 
-    return result.toDataStreamResponse();
+      // Return stream compatible with AI SDK format
+      return result.toDataStreamResponse();
+    } catch (error) {
+      console.error("OpenAI API error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to get response from AI. Please try again.";
+      return createTextStream(`**Error:** ${errorMessage}`);
+    }
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(
-      JSON.stringify({
-        error: "Internal Server Error",
-        details: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    // Use AI SDK compatible stream for error message
+    console.error("Chat API error:", error);
+    return createTextStream(
+      `**Error:** ${error instanceof Error ? error.message : "An unexpected error occurred"}`
     );
   }
 };
