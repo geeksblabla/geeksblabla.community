@@ -5,7 +5,7 @@ keywords: ["blablaConf", "Morocco", "Conferences", "Events"]
 pubDatetime: 2025-05-14
 authors: ["youssouf"] # the name of the author file
 description: "Discover how the full BlablaConf process on selecting talks and speakers works"
-ogImage: "./images/geeksblabla-campus-logo.png"
+ogImage: "./images/blablaconf-cfp.png"
 ---
 
 We all agree that content is one of the most important aspects of any conference, along with meeting new people and having a good time. A solid process for selecting content can significantly contribute to the success of any conference.
@@ -18,7 +18,7 @@ This article only covers the content selection process for BlablaConf, if you ar
 
 ## 🇲🇦 What is BlablaConf?
 
-For those who don't know, BlablaConf is our annual Geeksblabla community conference entirely in Moroccan Darija. It's a 5+1 days conference with speakers from various backgrounds and levels of expertise share their knowledge and experience with the community. Mostly online with few in-person events around Morocco.
+For those who don't know, BlablaConf is our annual Geeksblabla community conference entirely in Moroccan Darija. It's a 5+1 days conference where speakers from various backgrounds and levels of expertise share their knowledge and experience with the community. Mostly online with few in-person days around Morocco.
 
 ## 📝 Call for papers
 
