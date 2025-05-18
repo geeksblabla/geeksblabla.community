@@ -4,13 +4,14 @@ tags: ["conference", "blablaConf"]
 keywords: ["blablaConf", "Morocco", "Conferences", "Events"]
 pubDatetime: 2025-05-14
 authors: ["youssouf"] # the name of the author file
+slug: "blablaconf-content-selection-process"
 description: "Discover how the full BlablaConf process on selecting talks and speakers works"
 ogImage: "./images/blablaconf-cfp.png"
 ---
 
 We all agree that content is one of the most important aspects of any conference, along with meeting new people and having a good time. A solid process for selecting content can significantly contribute to the success of any conference.
 
-Having organized the BlablaConf conference for five years now, we have developed a process that we believe works quite well.
+Having organized the [BlablaConf](https://blablaconf.com) conference for five years now, we have developed a process that we believe works quite well.
 
 As transparency is one of our core values, this article serves to share our process with you. It will provide answers for those interested in submitting a talk in the future, as well as insights into why your talk may not have been selected in the past.
 
@@ -18,7 +19,7 @@ This article only covers the content selection process for BlablaConf, if you ar
 
 ## 🇲🇦 What is BlablaConf?
 
-For those who don't know, BlablaConf is our annual Geeksblabla community conference entirely in Moroccan Darija. It's a 5+1 days conference where speakers from various backgrounds and levels of expertise share their knowledge and experience with the community. Mostly online with few in-person days around Morocco.
+For those who don't know, [BlablaConf](https://blablaconf.com) is our annual Geeksblabla community conference entirely in Moroccan Darija. It's a 5+1 days conference where speakers from various backgrounds and levels of expertise share their knowledge and experience with the community. Mostly online with few in-person days around Morocco.
 
 ## 📝 Call for papers
 
@@ -48,7 +49,7 @@ Here is the stats of the CFP for the 2025 edition:
 
 ## 🤝 Content committee
 
-As we believe BlablaConf is a community conference and it's by developers for developers. We create a content committee of around 15 people to help us select the best talks.
+As we believe BlablaConf is a community conference and it's by developers for developers. We create a content committee of around 20 people to help us select the best talks.
 
 For that we create a simple form and share it with the community through our social media channels asking for volunteers to help selecting talks.
 
@@ -60,7 +61,7 @@ Here are the faces of the committee members who assisted us in 2025 edition:
 
 ![committee members](./images/community-members.jpeg)
 
-All selected committee members will have access to the sessionize.com platform where they can go through the submissions and give their rating and feedback and here are few rules we asked them to follow:
+All selected committee members will have access to the sessionize.com platform where they can go through the submissions and give their rating(1-5 stars) and feedback and here are few rules we asked them to follow:
 
 - No need to rate all submissions, you can focus on the ones you are interested in and you know something about. Skip the ones you are not sure about.
 - If you think a submission is outstanding, make sure to add a comment for it so we can take it into account.
@@ -74,11 +75,11 @@ By the end of the process we have something similar to this:
 
 ## 🥷 Track lead selection
 
-You may notice in the conference live streams that we have a different person hosting each day. Now you know why; we assign a track lead for each day.
+You may notice in the conference live streams that we have a different person hosting each conference day. Now you know why; we assign a track lead for each day.
 
 The track lead has multiple responsibilities but as part of the content selection process, they need to prepare the draft schedule for their day.
 
-We have a list of rules that we ask the track lead to follow while preparing the draft schedule for their day:
+We have a list of rules that we ask the track lead to follow while preparing the draft schedule:
 
 - 1. The rating of the talks should be taken into account.
 - 2. The selected talks should be balanced in the terms of level (beginner, intermediate, advanced)
@@ -86,13 +87,15 @@ We have a list of rules that we ask the track lead to follow while preparing the
 - 4. Respect conference time constraints, max 10 talks per day, total time 4 hours
 - 5. Diversity in terms of topics.
 
-This step is one of the most challenging because you must ensure that the schedule is balanced while respecting nearly all the rules simultaneously.
+This step is one of the most challenging part of the process because track leads must ensure that the schedule is balanced while respecting nearly all the rules simultaneously.
 
 ## 🔥 The long Meeting
 
 Now that we have a draft schedule for each day with selected talks, we hold a meeting with our core team members to finalize it.
 
 The main goal is to review each day, challenge the decisions of the track lead, and ensure that all rules have been followed.
+
+Most of the time, we agree on the schedule, but sometime we start debating on few talks and in this case normally the final decision goes to the track lead.
 
 By the end of the meeting, we will have a final schedule for each day, including the exact time for each talk. Some sessions will be added to the acceptance queue in case we need to include more talks.
 
@@ -112,4 +115,4 @@ By now, you may understand why your past talks might not have been selected. If 
 
 We hope this article helps you understand the content selection process for BlablaConf. While we believe the process is fair and transparent, we agree that it's far from perfect and we are always looking for ways to improve it and we would love to hear your feedback and suggestions.
 
-As you may have noticed, more than 200 people submitted their talks for the 2025 edition, but we only selected around 50. We believe we are missing out on many potential speakers and valuable content in Darija. Therefore, we are finalizing updates to the [**lass9 Mofid** ](https://www.youtube.com/playlist?list=PLUa7iphNQNrzEgsERIvKR2tkA1Ra-4Lay) sessions concept to make it a standalone project. This will allow people to submit their talks year-round, not just during BlablaConf week. If you are interested in being the first to host a lass9 Mofid session, please contact us on [Linkedin](https://www.linkedin.com/company/geeksblabla-community/).
+As you may have noticed, more than 200 people submitted their talks for the 2025 edition, but we only selected around 50. We believe we are missing out on many potential speakers and valuable content in Darija. Therefore, we are finalizing updates to the [**lass9 Mofid** ](https://www.youtube.com/playlist?list=PLUa7iphNQNrzEgsERIvKR2tkA1Ra-4Lay) sessions concept to make it a standalone project. This will allow people to submit their talks year-round, not just during BlablaConf week. If you are interested in being on the early access list to submit your lass9 Mofid session, please contact us on [Linkedin](https://www.linkedin.com/company/geeksblabla-community/).
