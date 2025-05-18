@@ -2,7 +2,7 @@
 title: "BlablaConf: Why your talk might not be selected?"
 tags: ["conference", "blablaConf"]
 keywords: ["blablaConf", "Morocco", "Conferences", "Events"]
-pubDatetime: 2025-05-14
+pubDatetime: 2025-05-19
 authors: ["youssouf"] # the name of the author file
 slug: "blablaconf-content-selection-process"
 description: "Discover how the full BlablaConf process on selecting talks and speakers works"
