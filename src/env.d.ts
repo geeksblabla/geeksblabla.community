@@ -11,6 +11,10 @@ interface ImportMetaEnv {
   readonly N_RESULTS_RETRIEVE: string;
   readonly N_RESULTS_CONTEXT: string;
   readonly TRANSLATE_NON_ENGLISH: string;
+  readonly UPSTASH_REDIS_REST_URL: string;
+  readonly UPSTASH_REDIS_REST_TOKEN: string;
+  readonly RATE_LIMIT_MAX: string;
+  readonly RATE_LIMIT_WINDOW: string;
 }
 
 interface ImportMeta {
