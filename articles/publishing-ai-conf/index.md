@@ -20,6 +20,7 @@ Growth is exponential (≈46 % CAGR), while the global acceptance rate hovers ar
 ![orals](images/orals.png)
 
 ## What Separates Accepted From Rejected?
+
 Desk rejections = 25 % of submissions
 Common causes: formatting, missing anonymisation, lack of baselines, irreproducible code.
 Seniority premium (≈ ×3 odds)
@@ -30,6 +31,7 @@ Strategic fit
 Tracks such as Efficient ML or Alignment & Safety historically exhibit acceptance rates 4–6 pp above the conference mean. Topic selection is a strategic parameter, not an afterthought.
 
 ## Takeaways for the PhD Author
+
 Treat acceptance as a multivariate optimisation problem — idea and presentation and positioning.
 Exploit accessible covariates (writing grade, compliance, senior mentorship) that shift odds measurably.
 Leverage community infrastructure; individual brilliance scales poorly against exponential submission growth.

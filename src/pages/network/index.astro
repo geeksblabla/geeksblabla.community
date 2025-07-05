@@ -5,15 +5,15 @@ import { SITE } from "@/config";
 ---
 
 <Layout title={`Network | ${SITE.title}`}>
-  <div class="relative bg-[#F2F4F7] overflow-hidden">
+  <div class="relative overflow-hidden bg-[#F2F4F7]">
     <!-- Moroccan Pattern Background -->
     <div class="absolute inset-0 z-0">
       <div class="moroccan-pattern-1 absolute inset-0 opacity-10"></div>
       <div class="moroccan-pattern-2 absolute inset-0 opacity-5"></div>
     </div>
-    
+
     <Header />
-    <main class="main mx-auto py-8 md:py-16 relative z-10">
+    <main class="main relative z-10 mx-auto py-8 md:py-16">
       <section class="mb-12 text-center">
         <h1 class="mb-4 text-4xl font-bold">Moroccans in AI Research</h1>
         <p class="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">
@@ -310,7 +310,7 @@ import { SITE } from "@/config";
         this.currentSort = null;
         this.searchTimeout = null;
         this.isLoading = false;
-        
+
         // DOM elements
         this.elements = {
           container: document.getElementById("researcher-container"),
@@ -331,9 +331,9 @@ import { SITE } from "@/config";
           closeModal: document.getElementById("close-modal"),
           cancelBtn: document.getElementById("cancel-btn"),
           closeSuccessModal: document.getElementById("close-success-modal"),
-          researcherForm: document.getElementById("researcher-form")
+          researcherForm: document.getElementById("researcher-form"),
         };
-        
+
         this.init();
       }
 
@@ -351,20 +351,28 @@ import { SITE } from "@/config";
 
       bindEvents() {
         // Search input with debouncing
-        this.elements.searchInput?.addEventListener("input", (e) => {
+        this.elements.searchInput?.addEventListener("input", e => {
           this.handleSearch(e.target.value);
         });
 
         // Interest filter
-        this.elements.interestSelect?.addEventListener("change", (e) => {
+        this.elements.interestSelect?.addEventListener("change", e => {
           this.handleFilterChange(e.target.value);
         });
 
         // Sort buttons - remove inline onclick handlers
-        this.elements.sortName?.addEventListener("click", () => this.sortByName());
-        this.elements.sortHindex?.addEventListener("click", () => this.sortByHIndex());
-        this.elements.sortCitations?.addEventListener("click", () => this.sortByCitations());
-        this.elements.sortShuffle?.addEventListener("click", () => this.shuffleList());
+        this.elements.sortName?.addEventListener("click", () =>
+          this.sortByName()
+        );
+        this.elements.sortHindex?.addEventListener("click", () =>
+          this.sortByHIndex()
+        );
+        this.elements.sortCitations?.addEventListener("click", () =>
+          this.sortByCitations()
+        );
+        this.elements.sortShuffle?.addEventListener("click", () =>
+          this.shuffleList()
+        );
 
         // Modal events
         this.bindModalEvents();
@@ -377,25 +385,31 @@ import { SITE } from "@/config";
         });
 
         // Close modal events
-        this.elements.closeModal?.addEventListener("click", () => this.closeModal());
-        this.elements.cancelBtn?.addEventListener("click", () => this.closeModal());
-        this.elements.closeSuccessModal?.addEventListener("click", () => this.closeSuccessModal());
+        this.elements.closeModal?.addEventListener("click", () =>
+          this.closeModal()
+        );
+        this.elements.cancelBtn?.addEventListener("click", () =>
+          this.closeModal()
+        );
+        this.elements.closeSuccessModal?.addEventListener("click", () =>
+          this.closeSuccessModal()
+        );
 
         // Close modal when clicking outside
-        this.elements.modal?.addEventListener("click", (e) => {
+        this.elements.modal?.addEventListener("click", e => {
           if (e.target === this.elements.modal) {
             this.closeModal();
           }
         });
 
-        this.elements.successModal?.addEventListener("click", (e) => {
+        this.elements.successModal?.addEventListener("click", e => {
           if (e.target === this.elements.successModal) {
             this.closeSuccessModal();
           }
         });
 
         // Handle form submission
-        this.elements.researcherForm?.addEventListener("submit", (e) => {
+        this.elements.researcherForm?.addEventListener("submit", e => {
           this.handleFormSubmission(e);
         });
       }
@@ -428,12 +442,14 @@ import { SITE } from "@/config";
       }
 
       isValidResearcher(researcher) {
-        return researcher && 
-               researcher.name && 
-               researcher.photo && 
-               researcher.position && 
-               researcher.affiliation && 
-               Array.isArray(researcher.interests);
+        return (
+          researcher &&
+          researcher.name &&
+          researcher.photo &&
+          researcher.position &&
+          researcher.affiliation &&
+          Array.isArray(researcher.interests)
+        );
       }
 
       initializeFilters() {
@@ -442,12 +458,14 @@ import { SITE } from "@/config";
         const allInterests = this.allResearchers
           .flatMap(r => r.interests || [])
           .filter(Boolean);
-        
+
         const uniqueInterests = [...new Set(allInterests)].sort();
 
         // Clear existing options except "All Interests"
-        const firstOption = this.elements.interestSelect.querySelector('option[value="all"]');
-        this.elements.interestSelect.innerHTML = '';
+        const firstOption = this.elements.interestSelect.querySelector(
+          'option[value="all"]'
+        );
+        this.elements.interestSelect.innerHTML = "";
         if (firstOption) {
           this.elements.interestSelect.appendChild(firstOption);
         }
@@ -485,17 +503,20 @@ import { SITE } from "@/config";
 
       filterResearchers(filter, query) {
         return this.allResearchers.filter(researcher => {
-          const matchesFilter = filter === "all" || 
-                               (researcher.interests && researcher.interests.includes(filter));
-          
+          const matchesFilter =
+            filter === "all" ||
+            (researcher.interests && researcher.interests.includes(filter));
+
           if (!query) return matchesFilter;
 
           const searchText = [
             researcher.name,
             researcher.affiliation,
             researcher.position,
-            ...(researcher.interests || [])
-          ].join(" ").toLowerCase();
+            ...(researcher.interests || []),
+          ]
+            .join(" ")
+            .toLowerCase();
 
           return matchesFilter && searchText.includes(query);
         });
@@ -503,19 +524,19 @@ import { SITE } from "@/config";
 
       sortResearchers(researchers) {
         const sortedResearchers = [...researchers];
-        
+
         switch (this.currentSort) {
           case "name":
-            return sortedResearchers.sort((a, b) => 
+            return sortedResearchers.sort((a, b) =>
               (a.name || "").localeCompare(b.name || "")
             );
           case "hindex":
-            return sortedResearchers.sort((a, b) => 
-              (b.hindex || 0) - (a.hindex || 0)
+            return sortedResearchers.sort(
+              (a, b) => (b.hindex || 0) - (a.hindex || 0)
             );
           case "citations":
-            return sortedResearchers.sort((a, b) => 
-              (b.citedby || 0) - (a.citedby || 0)
+            return sortedResearchers.sort(
+              (a, b) => (b.citedby || 0) - (a.citedby || 0)
             );
           default:
             return sortedResearchers;
@@ -524,7 +545,7 @@ import { SITE } from "@/config";
 
       createResearcherCard(researcher) {
         const card = document.createElement("div");
-        card.className = 
+        card.className =
           "group cursor-pointer rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-lg hover:border-blue-300";
 
         const photoPath = this.getPhotoPath(researcher.photo);
@@ -559,11 +580,13 @@ import { SITE } from "@/config";
         const hasMetrics = researcher.hindex || researcher.citedby;
         if (!hasMetrics) return "";
 
-        const hindex = researcher.hindex ? 
-          `<span class="flex items-center gap-1"><i class="fas fa-chart-line"></i> h-index: ${this.formatNumber(researcher.hindex)}</span>` : "";
-        
-        const citations = researcher.citedby ? 
-          `<span class="flex items-center gap-1"><i class="fas fa-quote-right"></i> ${this.formatNumber(researcher.citedby)} citations</span>` : "";
+        const hindex = researcher.hindex
+          ? `<span class="flex items-center gap-1"><i class="fas fa-chart-line"></i> h-index: ${this.formatNumber(researcher.hindex)}</span>`
+          : "";
+
+        const citations = researcher.citedby
+          ? `<span class="flex items-center gap-1"><i class="fas fa-quote-right"></i> ${this.formatNumber(researcher.citedby)} citations</span>`
+          : "";
 
         return `
           <div class="mt-3 flex gap-4 text-xs text-gray-500">
@@ -587,11 +610,16 @@ import { SITE } from "@/config";
         const remainingCount = interests.length - 3;
 
         const interestTags = displayedInterests
-          .map(tag => `<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 transition-colors">${tag}</span>`)
+          .map(
+            tag =>
+              `<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 transition-colors">${tag}</span>`
+          )
           .join("");
 
-        const remainingTag = remainingCount > 0 ? 
-          `<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-500">+${remainingCount}</span>` : "";
+        const remainingTag =
+          remainingCount > 0
+            ? `<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-500">+${remainingCount}</span>`
+            : "";
 
         return `
           <div class="mt-4 flex flex-wrap justify-center gap-1">
@@ -603,24 +631,34 @@ import { SITE } from "@/config";
 
       formatSocialLinks(researcher) {
         const links = [];
-        
+
         if (researcher.scholar) {
-          links.push(`<a href="${researcher.scholar}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="Google Scholar"><i class='fas fa-graduation-cap text-sm'></i></a>`);
-        }
-        
-        if (researcher.linkedin) {
-          links.push(`<a href="${researcher.linkedin}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="LinkedIn"><i class='fab fa-linkedin text-sm'></i></a>`);
-        }
-        
-        if (researcher.website) {
-          links.push(`<a href="${researcher.website}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="Website"><i class='fas fa-globe text-sm'></i></a>`);
-        }
-        
-        if (researcher.twitter) {
-          links.push(`<a href="${researcher.twitter}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="Twitter"><i class='fab fa-twitter text-sm'></i></a>`);
+          links.push(
+            `<a href="${researcher.scholar}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="Google Scholar"><i class='fas fa-graduation-cap text-sm'></i></a>`
+          );
         }
 
-        return links.length ? `<div class="mt-4 flex gap-3">${links.join("")}</div>` : "";
+        if (researcher.linkedin) {
+          links.push(
+            `<a href="${researcher.linkedin}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="LinkedIn"><i class='fab fa-linkedin text-sm'></i></a>`
+          );
+        }
+
+        if (researcher.website) {
+          links.push(
+            `<a href="${researcher.website}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="Website"><i class='fas fa-globe text-sm'></i></a>`
+          );
+        }
+
+        if (researcher.twitter) {
+          links.push(
+            `<a href="${researcher.twitter}" target="_blank" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-all" title="Twitter"><i class='fab fa-twitter text-sm'></i></a>`
+          );
+        }
+
+        return links.length
+          ? `<div class="mt-4 flex gap-3">${links.join("")}</div>`
+          : "";
       }
 
       // Sort methods
@@ -645,7 +683,9 @@ import { SITE } from "@/config";
       shuffleList() {
         this.currentSort = null;
         this.updateActiveSort(this.elements.sortShuffle);
-        this.allResearchers = this.allResearchers.sort(() => Math.random() - 0.5);
+        this.allResearchers = this.allResearchers.sort(
+          () => Math.random() - 0.5
+        );
         this.applyCurrentFilters();
       }
 
@@ -671,7 +711,7 @@ import { SITE } from "@/config";
 
       updateResultsCount(count, total) {
         if (!this.elements.resultsCount) return;
-        
+
         if (count === total) {
           this.elements.resultsCount.textContent = `Showing all ${total} researchers`;
         } else {
@@ -738,8 +778,10 @@ import { SITE } from "@/config";
 
       async handleFormSubmission(e) {
         e.preventDefault();
-        
-        const submitBtn = this.elements.researcherForm.querySelector('button[type="submit"]');
+
+        const submitBtn = this.elements.researcherForm.querySelector(
+          'button[type="submit"]'
+        );
         const originalText = submitBtn.textContent;
 
         try {
@@ -776,7 +818,7 @@ import { SITE } from "@/config";
       handleError(message, error) {
         console.error(message, error);
         this.hideLoading();
-        
+
         if (this.elements.container) {
           this.elements.container.innerHTML = `
             <div class="col-span-full py-12 text-center">
@@ -795,7 +837,6 @@ import { SITE } from "@/config";
     new ResearcherNetwork();
   });
 </script>
-
 
 <link
   rel="stylesheet"

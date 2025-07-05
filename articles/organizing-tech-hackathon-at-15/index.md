@@ -1,16 +1,7 @@
 ---
 title: "Why we started MAIR"
-tags:
-  [
-    "hackathons",
-    "teens in tech",
-    "game development",
-  ]
-keywords:
-  [
-    "How to organize a hackathon",
-    "High school hackathon story",
-  ]
+tags: ["hackathons", "teens in tech", "game development"]
+keywords: ["How to organize a hackathon", "High school hackathon story"]
 pubDatetime: 2025-01-02
 authors: ["elbaha"]
 slug: organizing-tech-hackathon-at-15

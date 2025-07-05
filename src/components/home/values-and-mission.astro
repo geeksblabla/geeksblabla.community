@@ -11,20 +11,21 @@ type VV = {
   description: string;
 };
 const values: VV[] = [
-  { 
-    icon: OpennessIcon, 
-    name: "Openness", 
-    description: "Upholding high academic and technical standards." 
+  {
+    icon: OpennessIcon,
+    name: "Openness",
+    description: "Upholding high academic and technical standards.",
   },
-  { 
-    icon: SupportIcon, 
-    name: "Support", 
-    description: "Creating a culture of mentorship and generosity." 
+  {
+    icon: SupportIcon,
+    name: "Support",
+    description: "Creating a culture of mentorship and generosity.",
   },
-  { 
-    icon: VisibilityIcon, 
-    name: "Visibility", 
-    description: "Proactively changing the narrative about Moroccan scientific presence in AI." 
+  {
+    icon: VisibilityIcon,
+    name: "Visibility",
+    description:
+      "Proactively changing the narrative about Moroccan scientific presence in AI.",
   },
 ];
 
@@ -80,7 +81,7 @@ const animationDelays = [
                   <span class="pt-4 text-paragraph-sm font-light text-neutral-dark-20 md:text-2xl">
                     {value.name}
                   </span>
-                  <p class="mt-2 text-center text-sm text-neutral-dark-50 max-w-[200px] leading-relaxed">
+                  <p class="mt-2 max-w-[200px] text-center text-sm leading-relaxed text-neutral-dark-50">
                     {value.description}
                   </p>
                 </div>

@@ -22,22 +22,6 @@ pnpm install
 pnpm run dev
 ```
 
-To simplify project management, we added mock data to ensure the website functions in development mode without requiring any external API keys. However, if you want to work with real data for the gallery, episode planning, or adding new episodes through the website, you will need the following API keys:
-
-```sh
-# Required
-OPENAI_API_KEY="sk-..." # Your OpenAI API Key
-CHROMA_URL="http://localhost:8000" # URL of your ChromaDB instance (local Docker or remote)
-CHROMA_TOKEN="your-token-here" # Token for ChromaDB authentication (if required)
-
-# Optional (with default values)
-CHROMA_COLLECTION="podcast_episodes" # Default collection name in ChromaDB
-OPENAI_CHAT_MODEL="gpt-4-turbo" # Default chat model
-OPENAI_EMBEDDING_MODEL="text-embedding-3-small" # Default embedding model
-N_RESULTS_RETRIEVE="20" # Number of results to retrieve from ChromaDB
-N_RESULTS_CONTEXT="5" # Number of results to include in the context
-```
-
 ## 🚀 Project Structure
 
 Inside of your Astro project, you'll see the following folders and files:
@@ -162,9 +146,3 @@ Article content
 ## Licensing
 
 The code in this project is licensed under MIT license.
-
-## Contributors
-
-Big thanks to all the code contributors who made this project possible!
-
-![GeeksBlabla contributors](https://contributors.aika.dev/geeksblabla/geeksblabla.com/contributors.svg?max=44)
