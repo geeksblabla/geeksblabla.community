@@ -1,6 +1,6 @@
 ---
 date: 2025-01-05
-duration: "2:9:13"
+duration: "2:09:13"
 title: "Let's build a cloud provider"
 tags: ["cloud"]
 category: "dev"
