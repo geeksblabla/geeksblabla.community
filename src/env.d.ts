@@ -12,7 +12,7 @@ interface ImportMetaEnv {
   readonly N_RESULTS_CONTEXT: string;
   readonly TRANSLATE_NON_ENGLISH: string;
 
-  readonly OPENROUTER_API_KEY: string;
+  readonly OPEN_ROUTER_API_KEY: string;
   readonly SUPADATA_API_KEY: string;
 }
 

@@ -92,7 +92,7 @@ export const GET: APIRoute = async ({ request }) => {
     const content = await subtitleResponse.text();
 
     const openrouter = createOpenRouter({
-      apiKey: import.meta.env.OPENROUTER_API_KEY,
+      apiKey: import.meta.env.OPEN_ROUTER_API_KEY,
     });
 
     const prompt = `${ANALYSIS_PROMPT}\n\nSubtitle content: <subtitle>\n${content}\n</subtitle>`;
