@@ -18,12 +18,12 @@ const redirects = getAstroRedirects();
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
-  output: "hybrid",
+  output: "static",
   adapter: netlify(),
   prefetch: {
     prefetchAll: true,
   },
-  experimental: { contentLayer: true, serverIslands: true },
+  experimental: {},
   build: {
     format: "file",
   },
@@ -47,11 +47,14 @@ export default defineConfig({
 
   markdown: {
     rehypePlugins: [
-      [rehypeExternalLinks, {
-        target: '_blank',
-        rel: ['noopener', 'noreferrer'],
-        internal: true
-      }]
+      [
+        rehypeExternalLinks,
+        {
+          target: "_blank",
+          rel: ["noopener", "noreferrer"],
+          internal: true,
+        },
+      ],
     ],
     remarkPlugins: [
       remarkToc,

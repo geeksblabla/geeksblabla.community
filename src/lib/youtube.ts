@@ -15,6 +15,24 @@ const getYouTubeVideoId = (url: string) => {
 
 const YOUTUBE_API_KEY = import.meta.env.YOUTUBE_API_KEY;
 
+// Helper function to parse ISO 8601 duration to HH:MM:SS format
+const parseIsoDurationToHHMMSS = (isoDuration: string): string => {
+  // Remove PT prefix
+  const duration = isoDuration.replace("PT", "");
+
+  // Extract hours, minutes, seconds using regex
+  const hoursMatch = duration.match(/(\d+)H/);
+  const minutesMatch = duration.match(/(\d+)M/);
+  const secondsMatch = duration.match(/(\d+)S/);
+
+  const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+  const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+  const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
+
+  // Format as HH:MM:SS with zero padding
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+};
+
 export const getYoutubeVideoDetails = async (url: string) => {
   try {
     const videoId = getYouTubeVideoId(url);
@@ -26,11 +44,7 @@ export const getYoutubeVideoDetails = async (url: string) => {
     if (data.items && data.items[0]) {
       // Parse duration from ISO 8601 format
       const isoDuration = data.items[0].contentDetails.duration;
-      const duration = isoDuration
-        .replace("PT", "")
-        .replace("H", ":")
-        .replace("M", ":")
-        .replace("S", "");
+      const duration = parseIsoDurationToHHMMSS(isoDuration);
 
       // Get published date
       const publishedAt = new Date(data.items[0].snippet.publishedAt)
