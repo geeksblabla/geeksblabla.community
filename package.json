@@ -24,6 +24,7 @@
     "@ai-sdk/openai": "^2.0.21",
     "@ai-sdk/react": "^2.0.24",
     "@astrojs/check": "^0.9.4",
+    "@astrojs/cloudflare": "^12.6.6",
     "@astrojs/mdx": "^4.3.4",
     "@astrojs/netlify": "^6.5.8",
     "@astrojs/rss": "^4.0.12",

@@ -11,15 +11,17 @@ import rehypeExternalLinks from "rehype-external-links";
 
 import mdx from "@astrojs/mdx";
 import pagefind from "astro-pagefind";
-import netlify from "@astrojs/netlify";
+// import netlify from "@astrojs/netlify";
 import { getAstroRedirects } from "./src/redirects";
+
+import cloudflare from "@astrojs/cloudflare";
 
 const redirects = getAstroRedirects();
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
   output: "static",
-  adapter: netlify(),
+  adapter: cloudflare(),
   prefetch: {
     prefetchAll: true,
   },
@@ -73,7 +75,30 @@ export default defineConfig({
   vite: {
     assetsInclude: ["**/*.riv"],
     optimizeDeps: {
-      exclude: ["@resvg/resvg-js"],
+      exclude: ["@resvg/resvg-js", "node:fs", "stream"],
+    },
+    ssr: {
+      external: [
+        "@resvg/resvg-js",
+        "@resvg/resvg-js-darwin-arm64",
+        "@resvg/resvg-js-darwin-x64",
+        "@resvg/resvg-js-linux-arm64-gnu",
+        "@resvg/resvg-js-linux-arm64-musl",
+        "@resvg/resvg-js-linux-x64-gnu",
+        "@resvg/resvg-js-linux-x64-musl",
+        "@resvg/resvg-js-win32-arm64-msvc",
+        "@resvg/resvg-js-win32-x64-msvc",
+        "node:fs",
+        "node:path",
+        "node:url",
+        "node:crypto",
+        "path",
+        "fs",
+        "stream",
+        "util",
+        "console",
+        "child_process",
+      ],
     },
   },
   scopedStyleStrategy: "where",
