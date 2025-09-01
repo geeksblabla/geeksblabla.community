@@ -1,3 +1,5 @@
+import { YOUTUBE_API_KEY } from "astro:env/server";
+
 // Helper function to extract video ID from YouTube URL
 const getYouTubeVideoId = (url: string) => {
   // Handle regular YouTube URLs
@@ -12,8 +14,6 @@ const getYouTubeVideoId = (url: string) => {
   // Return the first match found
   return regularMatch?.[1] || liveMatch?.[1] || null;
 };
-
-const YOUTUBE_API_KEY = import.meta.env.YOUTUBE_API_KEY;
 
 // Helper function to parse ISO 8601 duration to HH:MM:SS format
 const parseIsoDurationToHHMMSS = (isoDuration: string): string => {

@@ -9,9 +9,13 @@ import type {
   NotionPage,
   NotionPeopleProperties,
 } from "./types";
+import {
+  NOTION_API_KEY,
+  GEEKSBLABLA_NOTION_DATABASE_ID,
+} from "astro:env/server";
 
-const databaseId = import.meta.env.GEEKSBLABLA_NOTION_DATABASE_ID;
-const apiKey = import.meta.env.NOTION_API_KEY;
+const databaseId = GEEKSBLABLA_NOTION_DATABASE_ID;
+const apiKey = NOTION_API_KEY;
 
 let notionClient: Client;
 

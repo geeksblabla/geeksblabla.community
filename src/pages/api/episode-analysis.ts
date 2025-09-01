@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 // import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
+import { OPEN_ROUTER_API_KEY } from "astro:env/server";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { z } from "zod";
 
@@ -92,7 +93,7 @@ export const GET: APIRoute = async ({ request }) => {
     const content = await subtitleResponse.text();
 
     const openrouter = createOpenRouter({
-      apiKey: import.meta.env.OPEN_ROUTER_API_KEY,
+      apiKey: OPEN_ROUTER_API_KEY as string,
     });
 
     const prompt = `${ANALYSIS_PROMPT}\n\nSubtitle content: <subtitle>\n${content}\n</subtitle>`;

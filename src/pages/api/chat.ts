@@ -1,8 +1,10 @@
 import type { APIRoute } from "astro";
 import type { UIMessage } from "ai";
 import { getRelevantDocuments } from "../../lib/embeddings";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
+
 import { streamText, convertToModelMessages } from "ai";
+import { OPENAI_API_KEY, OPENAI_CHAT_MODEL } from "astro:env/server";
 
 export const runtime = "edge";
 export const prerender = false;
@@ -106,10 +108,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create enhanced system prompt with context
     const enhancedSystemPrompt = `${SYSTEM_PROMPT}\n\nContext from podcast episodes:\n${context}\n\nRemember to:\n1. Be concise and direct\n2. Include relevant YouTube links with timestamps\n3. Format links as markdown\n4. If you're not sure, say so`;
-
+    const openai = createOpenAI({
+      apiKey: OPENAI_API_KEY,
+    });
     // Use streamText with toUIMessageStreamResponse for UI messages
     const result = await streamText({
-      model: openai(import.meta.env.OPENAI_CHAT_MODEL || "gpt-4-turbo"),
+      model: openai(OPENAI_CHAT_MODEL || "gpt-4-turbo"),
       system: enhancedSystemPrompt,
       messages: convertToModelMessages(messages),
       temperature: 0.7,

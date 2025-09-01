@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { SUPADATA_API_KEY } from "astro:env/server";
 
 export const runtime = "edge";
 export const prerender = false;
@@ -88,7 +89,7 @@ export const GET: APIRoute = async ({ request }) => {
     const supadataResponse = await fetch(supadataUrl, {
       method: "GET",
       headers: {
-        "x-api-key": import.meta.env.SUPADATA_API_KEY,
+        "x-api-key": SUPADATA_API_KEY as string,
         "Content-Type": "application/json",
       },
     });

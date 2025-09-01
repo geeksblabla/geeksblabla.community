@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import remarkToc from "remark-toc";
@@ -16,12 +16,98 @@ import { getAstroRedirects } from "./src/redirects";
 
 import cloudflare from "@astrojs/cloudflare";
 
+const envSchema = {
+  NOTION_API_KEY: envField.string({ context: "server", access: "secret" }),
+  GEEKSBLABLA_NOTION_DATABASE_ID: envField.string({
+    context: "server",
+    access: "secret",
+  }),
+  YOUTUBE_API_KEY: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  CLOUDINARY_API_SECRET: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  PUBLIC_CLOUDINARY_API_KEY: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  PUBLIC_CLOUDINARY_CLOUD_NAME: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  OPENAI_API_KEY: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  OPENAI_CHAT_MODEL: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  OPENAI_EMBEDDING_MODEL: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  CHROMA_URL: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  CHROMA_TOKEN: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  CHROMA_COLLECTION: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  N_RESULTS_RETRIEVE: envField.number({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  N_RESULTS_CONTEXT: envField.number({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  TRANSLATE_NON_ENGLISH: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  OPEN_ROUTER_API_KEY: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+  SUPADATA_API_KEY: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
+};
+
 const redirects = getAstroRedirects();
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
   output: "static",
   adapter: cloudflare(),
+  env: {
+    schema: envSchema,
+  },
   prefetch: {
     prefetchAll: true,
   },
