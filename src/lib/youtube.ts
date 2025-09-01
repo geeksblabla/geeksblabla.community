@@ -77,3 +77,77 @@ export const timestampToSeconds = (timestamp: string) => {
   }
   return hours * 3600 + minutes * 60 + seconds;
 };
+
+// Interface for transcript segments
+export interface TranscriptSegment {
+  text: string;
+  offset: number;
+  duration: number;
+  lang?: string;
+}
+
+// Function to fetch YouTube subtitles from Supadata API
+export const fetchYouTubeSubtitles = async (
+  youtubeUrl: string,
+  apiKey: string
+): Promise<TranscriptSegment[]> => {
+  // Validate YouTube URL
+  const youtubeRegex =
+    /^https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)/;
+  if (!youtubeRegex.test(youtubeUrl)) {
+    throw new Error("Invalid YouTube URL provided");
+  }
+
+  // Make request to Supadata API
+  const supadataUrl = `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent(youtubeUrl)}&language=ar`;
+  const response = await fetch(supadataUrl, {
+    method: "GET",
+    headers: {
+      "x-api-key": apiKey,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.text();
+    throw new Error(
+      `Supadata API error: ${response.status} ${response.statusText}. Details: ${errorData}`
+    );
+  }
+
+  const transcriptData = await response.json();
+  return transcriptData.content || transcriptData;
+};
+
+// Helper function to convert milliseconds to SRT timestamp format
+export const formatSRTTime = (milliseconds: number): string => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+};
+
+// Function to convert transcript data to SRT format
+export const convertToSRT = (transcriptData: TranscriptSegment[]): string => {
+  if (!Array.isArray(transcriptData)) {
+    return "Error: Invalid transcript data format";
+  }
+
+  let srtContent = "";
+
+  for (const segment of transcriptData) {
+    if (!segment.text || typeof segment.offset !== "number") {
+      continue; // Skip invalid segments
+    }
+
+    const startTime = formatSRTTime(segment.offset);
+    const endTime = formatSRTTime(segment.offset + segment.duration);
+
+    srtContent += `${startTime} --> ${endTime}\n`;
+    srtContent += `${segment.text}\n\n`;
+  }
+
+  return srtContent.trim();
+};

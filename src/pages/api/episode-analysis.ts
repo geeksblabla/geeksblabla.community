@@ -1,9 +1,10 @@
 import type { APIRoute } from "astro";
 // import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
-import { OPEN_ROUTER_API_KEY } from "astro:env/server";
+import { OPEN_ROUTER_API_KEY, SUPADATA_API_KEY } from "astro:env/server";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { z } from "zod";
+import { fetchYouTubeSubtitles, convertToSRT } from "../../lib/youtube";
 
 export const runtime = "edge";
 export const prerender = false;
@@ -44,6 +45,39 @@ ALWAYS start the first note at 00:00:00 and make sure to not exceed 20 notes.`;
 // GET endpoint that takes YouTube URL as query parameter and returns JSON
 export const GET: APIRoute = async ({ request }) => {
   try {
+    // Validate environment variables
+    if (!OPEN_ROUTER_API_KEY) {
+      console.error("OPEN_ROUTER_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({
+          error: "Configuration Error",
+          message: "OPEN_ROUTER_API_KEY not configured properly",
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    if (!SUPADATA_API_KEY) {
+      console.error("SUPADATA_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({
+          error: "Configuration Error",
+          message: "SUPADATA_API_KEY not configured properly",
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
     const url = new URL(request.url);
     const youtubeUrl = url.searchParams.get("url");
 
@@ -63,60 +97,50 @@ export const GET: APIRoute = async ({ request }) => {
       );
     }
 
-    // Validate that it's a YouTube URL
-    const youtubeRegex =
-      /^https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)/;
-    if (!youtubeRegex.test(youtubeUrl)) {
-      return new Response(
-        JSON.stringify({
-          error: "Invalid YouTube URL",
-          message: "Please provide a valid YouTube URL",
-        }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
+    // Fetch subtitle data directly using the shared function
+    console.log("Fetching subtitle for:", youtubeUrl);
+    const transcriptData = await fetchYouTubeSubtitles(
+      youtubeUrl,
+      SUPADATA_API_KEY as string
+    );
 
-    const fetchSubtitleUrl = `${new URL(request.url).origin}/api/youtube-subtitle?url=${youtubeUrl}`;
-    console.log(fetchSubtitleUrl);
-    // Fetch subtitle using the existing endpoint
-    const subtitleResponse = await fetch(fetchSubtitleUrl);
-    if (!subtitleResponse.ok) {
-      throw new Error(
-        `Failed to fetch subtitle: ${subtitleResponse.statusText}`
-      );
-    }
-    const content = await subtitleResponse.text();
+    // Convert transcript data to SRT format for AI processing
+    const content = convertToSRT(transcriptData);
+    console.log("Subtitle content length:", content.length);
 
     const openrouter = createOpenRouter({
       apiKey: OPEN_ROUTER_API_KEY as string,
     });
 
     const prompt = `${ANALYSIS_PROMPT}\n\nSubtitle content: <subtitle>\n${content}\n</subtitle>`;
-    console.log(prompt);
-    // Generate analysis using OpenAI with structured output
-    const result = await generateObject({
-      model: openrouter("google/gemini-2.5-pro"),
-      schema: AnalysisResultSchema,
-      schemaName: "EpisodeAnalysis",
-      schemaDescription:
-        "Analysis of podcast episode with description and chapter timestamps",
-      prompt,
-      temperature: 0.3, // Lower temperature for more consistent results
-    });
-    console.log(result.object);
+    console.log("Prompt length:", prompt.length);
 
-    // Return the structured analysis result
-    return new Response(JSON.stringify(result.object), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // Generate analysis using OpenRouter with structured output
+    try {
+      const result = await generateObject({
+        model: openrouter("google/gemini-2.5-pro"),
+        schema: AnalysisResultSchema,
+        schemaName: "EpisodeAnalysis",
+        schemaDescription:
+          "Analysis of podcast episode with description and chapter timestamps",
+        prompt,
+        temperature: 0.3, // Lower temperature for more consistent results
+      });
+      console.log("Analysis result:", result.object);
+
+      return new Response(JSON.stringify(result.object), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+        },
+      });
+    } catch (aiError) {
+      console.error("AI generation error:", aiError);
+      throw new Error(
+        `AI analysis failed: ${aiError instanceof Error ? aiError.message : "Unknown AI error"}`
+      );
+    }
   } catch (error) {
     console.error("Error in GET method:", error);
     return new Response(

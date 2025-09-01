@@ -109,7 +109,11 @@ const redirects = getAstroRedirects();
 export default defineConfig({
   site: SITE.website,
   output: "static",
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    platformProxy: {
+      enabled: true,
+    },
+  }),
   env: {
     schema: envSchema,
   },

@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { SUPADATA_API_KEY } from "astro:env/server";
+import { fetchYouTubeSubtitles, convertToSRT } from "../../lib/youtube";
 
 export const runtime = "edge";
 export const prerender = false;
@@ -7,52 +8,22 @@ export const prerender = false;
 // Mark this route as server-side only
 export const partial = true;
 
-interface TranscriptSegment {
-  text: string;
-  offset: number;
-  duration: number;
-  lang?: string;
-}
-
-// Helper function to convert milliseconds to SRT timestamp format
-function formatSRTTime(milliseconds: number): string {
-  const totalSeconds = Math.floor(milliseconds / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-}
-
-// Function to convert transcript data to SRT format
-function convertToSRT(transcriptData: TranscriptSegment[]): string {
-  if (!Array.isArray(transcriptData)) {
-    return "Error: Invalid transcript data format";
-  }
-
-  let srtContent = "";
-  //   let sequenceNumber = 1;
-
-  for (const segment of transcriptData) {
-    if (!segment.text || typeof segment.offset !== "number") {
-      continue; // Skip invalid segments
-    }
-
-    const startTime = formatSRTTime(segment.offset);
-    const endTime = formatSRTTime(segment.offset + segment.duration);
-
-    // srtContent += `${sequenceNumber}\n`;
-    srtContent += `${startTime} --> ${endTime}\n`;
-    srtContent += `${segment.text}\n\n`;
-
-    // sequenceNumber++;
-  }
-
-  return srtContent.trim();
-}
-
 export const GET: APIRoute = async ({ request }) => {
   try {
+    // Validate environment variables
+    if (!SUPADATA_API_KEY) {
+      console.error("SUPADATA_API_KEY is not configured");
+      return new Response(
+        "Error: Configuration Error\nSUPADATA_API_KEY is not configured properly",
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+          },
+        }
+      );
+    }
+
     // Get the YouTube URL from query parameters
     const url = new URL(request.url);
     const youtubeUrl = url.searchParams.get("url");
@@ -69,51 +40,14 @@ export const GET: APIRoute = async ({ request }) => {
       );
     }
 
-    // Validate that it's a YouTube URL
-    const youtubeRegex =
-      /^https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)/;
-    if (!youtubeRegex.test(youtubeUrl)) {
-      return new Response(
-        "Error: Invalid YouTube URL\nPlease provide a valid YouTube URL",
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-          },
-        }
-      );
-    }
-
-    // Make request to Supadata API
-    const supadataUrl = `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent(youtubeUrl)}&language=ar`;
-    const supadataResponse = await fetch(supadataUrl, {
-      method: "GET",
-      headers: {
-        "x-api-key": SUPADATA_API_KEY as string,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!supadataResponse.ok) {
-      const errorData = await supadataResponse.text();
-      console.error("Supadata API error:", errorData);
-
-      return new Response(
-        `Error: Failed to fetch transcript\nSupadata API returned ${supadataResponse.status}: ${supadataResponse.statusText}\nDetails: ${errorData}`,
-        {
-          status: supadataResponse.status,
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-          },
-        }
-      );
-    }
-
-    // Get the transcript data from Supadata
-    const transcriptData = await supadataResponse.json();
+    // Fetch transcript data using the shared function
+    const transcriptData = await fetchYouTubeSubtitles(
+      youtubeUrl,
+      SUPADATA_API_KEY as string
+    );
 
     // Convert transcript data to SRT format
-    const srtContent = convertToSRT(transcriptData.content || transcriptData);
+    const srtContent = convertToSRT(transcriptData);
 
     // Return the transcript data as SRT text
     return new Response(srtContent, {
