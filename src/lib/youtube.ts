@@ -1,5 +1,3 @@
-import { YOUTUBE_API_KEY } from "astro:env/server";
-
 // Helper function to extract video ID from YouTube URL
 const getYouTubeVideoId = (url: string) => {
   // Handle regular YouTube URLs
@@ -33,11 +31,11 @@ const parseIsoDurationToHHMMSS = (isoDuration: string): string => {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
-export const getYoutubeVideoDetails = async (url: string) => {
+export const getYoutubeVideoDetails = async (url: string, apiKey: string) => {
   try {
     const videoId = getYouTubeVideoId(url);
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=contentDetails,snippet&key=${YOUTUBE_API_KEY}`
+      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=contentDetails,snippet&key=${apiKey}`
     );
     const data = await response.json();
 

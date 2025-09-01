@@ -2,6 +2,7 @@ import { getEpisodeDetails as getNotionEpisodeDetails } from "@/lib/notion";
 import { getYoutubeVideoDetails } from "@/lib/youtube";
 import { defineAction, ActionError } from "astro:actions";
 import { z } from "astro:schema";
+import { YOUTUBE_API_KEY } from "astro:env/server";
 
 export const getEpisodeDetails = defineAction({
   accept: "json",
@@ -19,7 +20,8 @@ export const getEpisodeDetails = defineAction({
     try {
       const episodeDetails = await getNotionEpisodeDetails(episodeId);
       const youtubeDetails = await getYoutubeVideoDetails(
-        episodeDetails.youtube
+        episodeDetails.youtube,
+        YOUTUBE_API_KEY as string
       );
       return {
         ...episodeDetails,
