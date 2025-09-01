@@ -1,7 +1,10 @@
 import type { APIRoute } from "astro";
+import type { UIMessage } from "ai";
 import { getRelevantDocuments } from "../../lib/embeddings";
-import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+
+import { streamText, convertToModelMessages } from "ai";
+import { OPENAI_API_KEY, OPENAI_CHAT_MODEL } from "astro:env/server";
 
 export const runtime = "edge";
 export const prerender = false;
@@ -74,11 +77,15 @@ Based *only* on the English context provided above from our podcast episodes, pl
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { messages } = await request.json();
+    const { messages }: { messages: UIMessage[] } = await request.json();
     const lastMessage = messages[messages.length - 1];
 
     // Get relevant documents
-    const relevantDocs = await getRelevantDocuments(lastMessage.content);
+    const lastMessageText = lastMessage.parts
+      .filter(part => part.type === "text")
+      .map(part => (part.type === "text" ? part.text : ""))
+      .join("");
+    const relevantDocs = await getRelevantDocuments(lastMessageText);
 
     // Create context from documents with proper sorting
     const context = relevantDocs
@@ -99,21 +106,21 @@ export const POST: APIRoute = async ({ request }) => {
       })
       .join("\n\n");
 
-    // Create system message with context
-    const systemMessage = {
-      role: "system",
-      content: `${SYSTEM_PROMPT}\n\nContext from podcast episodes:\n${context}\n\nRemember to:\n1. Be concise and direct\n2. Include relevant YouTube links with timestamps\n3. Format links as markdown\n4. If you're not sure, say so`,
-    };
-
-    // Use streamText with toDataStreamResponse for simpler streaming
+    // Create enhanced system prompt with context
+    const enhancedSystemPrompt = `${SYSTEM_PROMPT}\n\nContext from podcast episodes:\n${context}\n\nRemember to:\n1. Be concise and direct\n2. Include relevant YouTube links with timestamps\n3. Format links as markdown\n4. If you're not sure, say so`;
+    const openai = createOpenAI({
+      apiKey: OPENAI_API_KEY,
+    });
+    // Use streamText with toUIMessageStreamResponse for UI messages
     const result = await streamText({
-      model: openai(import.meta.env.OPENAI_CHAT_MODEL || "gpt-4-turbo"),
-      messages: [systemMessage, ...messages],
+      model: openai(OPENAI_CHAT_MODEL || "gpt-4-turbo"),
+      system: enhancedSystemPrompt,
+      messages: convertToModelMessages(messages),
       temperature: 0.7,
-      maxTokens: 1000,
+      maxOutputTokens: 1000,
     });
 
-    return result.toDataStreamResponse();
+    return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error("Error:", error);
     return new Response(

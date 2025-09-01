@@ -1,20 +1,33 @@
 import { ChromaClient, IncludeEnum } from "chromadb";
 import OpenAI from "openai";
+import {
+  OPENAI_API_KEY,
+  CHROMA_URL,
+  CHROMA_TOKEN,
+  CHROMA_COLLECTION,
+  OPENAI_EMBEDDING_MODEL,
+  N_RESULTS_RETRIEVE,
+  N_RESULTS_CONTEXT,
+} from "astro:env/server";
+
+import * as env from "astro:env/server";
+
+console.log(env.OPENAI_API_KEY);
 
 const openai = new OpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
+  apiKey: OPENAI_API_KEY,
 });
 
 const client = new ChromaClient({
-  path: import.meta.env.CHROMA_URL,
+  path: CHROMA_URL,
   auth: {
     provider: "token",
-    credentials: `Bearer ${import.meta.env.CHROMA_TOKEN}`,
+    credentials: `Bearer ${CHROMA_TOKEN}`,
   },
 });
 
 const collection = client.getCollection({
-  name: import.meta.env.CHROMA_COLLECTION || "podcast_episodes",
+  name: CHROMA_COLLECTION || "podcast_episodes",
 });
 
 interface DocumentMetadata {
@@ -33,19 +46,19 @@ interface Document {
 
 export async function getRelevantDocuments(
   query: string,
-  limit: number = Number(import.meta.env.N_RESULTS_CONTEXT) || 10
+  limit: number = Number(N_RESULTS_CONTEXT) || 10
 ): Promise<Document[]> {
   try {
     // Get embedding for query
     const embedding = await openai.embeddings.create({
-      model: import.meta.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
+      model: OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
       input: query,
     });
 
     const coll = await collection;
     const results = await coll.query({
       queryEmbeddings: [embedding.data[0].embedding],
-      nResults: Number(import.meta.env.N_RESULTS_RETRIEVE) || 20, // Get more results to sort
+      nResults: Number(N_RESULTS_RETRIEVE) || 20, // Get more results to sort
       include: [
         IncludeEnum.Metadatas,
         IncludeEnum.Documents,

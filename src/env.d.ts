@@ -11,6 +11,9 @@ interface ImportMetaEnv {
   readonly N_RESULTS_RETRIEVE: string;
   readonly N_RESULTS_CONTEXT: string;
   readonly TRANSLATE_NON_ENGLISH: string;
+
+  readonly OPEN_ROUTER_API_KEY: string;
+  readonly SUPADATA_API_KEY: string;
 }
 
 interface ImportMeta {

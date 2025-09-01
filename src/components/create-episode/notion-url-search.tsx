@@ -45,7 +45,7 @@ export function NotionUrlSearch({
       return;
     }
 
-    const defaultValues = getDefaultValues(data.duration);
+    const defaultValues = getDefaultValues(data.duration as string);
     const episodeData = {
       ...defaultValues,
       title: data.title,
@@ -57,7 +57,7 @@ export function NotionUrlSearch({
       description: data.description,
       duration: data.duration,
     };
-    onDataFetch(episodeData);
+    onDataFetch({ ...episodeData, duration: episodeData.duration as string });
     setIsLoading(false);
   };
 

@@ -1,5 +1,6 @@
 import { file, glob } from "astro/loaders";
 import { defineCollection } from "astro:content";
+import { PUBLIC_CLOUDINARY_CLOUD_NAME } from "astro:env/server";
 import { cldAssetsLoader } from "astro-cloudinary/loaders";
 import {
   authorSchema,
@@ -34,7 +35,7 @@ export const authors = defineCollection({
  * As you need env vars to use cldAssetsLoader, we need to use a mock data to allow people to play with the website locally
  */
 
-const gallery = !import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME
+const gallery = !PUBLIC_CLOUDINARY_CLOUD_NAME
   ? defineCollection({
       loader: file("gallery-mock-data.json"),
     })

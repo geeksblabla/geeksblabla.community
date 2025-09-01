@@ -9,9 +9,13 @@ import type {
   NotionPage,
   NotionPeopleProperties,
 } from "./types";
+import {
+  NOTION_API_KEY,
+  GEEKSBLABLA_NOTION_DATABASE_ID,
+} from "astro:env/server";
 
-const databaseId = import.meta.env.GEEKSBLABLA_NOTION_DATABASE_ID;
-const apiKey = import.meta.env.NOTION_API_KEY;
+const databaseId = GEEKSBLABLA_NOTION_DATABASE_ID;
+const apiKey = NOTION_API_KEY;
 
 let notionClient: Client;
 
@@ -31,7 +35,7 @@ export async function getGeekBlablaEpisodesPlannings(): Promise<NotionNormalized
   }
 
   const episodes = (await getNotionClient().databases.query({
-    database_id: databaseId,
+    database_id: databaseId as string,
     filter: {
       or: [
         {
@@ -243,7 +247,7 @@ export async function addNewEpisodeToNotion({
     const response = await notion.pages.create({
       parent: {
         type: "database_id",
-        database_id: databaseId,
+        database_id: databaseId as string,
       },
       properties: {
         title: {

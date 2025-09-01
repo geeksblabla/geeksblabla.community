@@ -1,4 +1,6 @@
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 
@@ -28,10 +30,12 @@ const components: Components = {
 };
 
 export default function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
-    useChat({
+  const [input, setInput] = useState("");
+  const { messages, sendMessage, status, error } = useChat({
+    transport: new DefaultChatTransport({
       api: "/api/chat",
-    });
+    }),
+  });
 
   return (
     <div className="flex h-[600px] flex-col bg-gray-50">
@@ -48,11 +52,15 @@ export default function ChatInterface() {
                   : "prose prose-sm max-w-none rounded-tl-sm bg-white text-gray-800 shadow-sm"
               }`}
             >
-              <ReactMarkdown components={components}>{m.content}</ReactMarkdown>
+              <ReactMarkdown components={components}>
+                {m.parts
+                  .map(part => (part.type === "text" ? part.text : ""))
+                  .join("")}
+              </ReactMarkdown>
             </div>
           </div>
         ))}
-        {isLoading && (
+        {(status === "submitted" || status === "streaming") && (
           <div className="animate-fade-in flex justify-start">
             <div className="flex max-w-[80px] items-center gap-2 rounded-2xl rounded-tl-sm bg-gray-100 p-3 text-gray-800">
               <div className="flex gap-1">
@@ -76,19 +84,28 @@ export default function ChatInterface() {
       </div>
 
       <div className="border-t bg-white p-4">
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            if (input.trim()) {
+              sendMessage({ text: input });
+              setInput("");
+            }
+          }}
+          className="flex gap-2"
+        >
           <input
             type="text"
             value={input}
-            onChange={handleInputChange}
+            onChange={e => setInput(e.target.value)}
             placeholder="Ask a question about our podcast episodes..."
-            disabled={isLoading}
+            disabled={status !== "ready"}
             className="flex-1 rounded-full border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-50"
             required
           />
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={status !== "ready"}
             className="rounded-full bg-blue-50 px-6 py-2 text-white hover:bg-blue-40 focus:outline-none focus:ring-2 focus:ring-blue-50"
           >
             Send

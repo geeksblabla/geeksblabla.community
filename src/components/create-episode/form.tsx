@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Guests } from "./guests";
 import { Hosts } from "./hosts";
 import { GenerateEpisodeButton } from "./generate-episode-button";
+import { GenerateWithAIButton } from "./generate-with-ai-button";
 import { NotionUrlSearch } from "./notion-url-search";
 
 const getYoutubeId = (url: string) => {
@@ -49,10 +50,11 @@ const NewEpisodeForm = ({
 
   return (
     <div className="relative">
-      <div className="absolute right-0 top-0">
+      <div className="absolute right-0 top-0 flex gap-2">
+        <GenerateWithAIButton setValue={setValue} watch={watch} />
         <GenerateEpisodeButton handleSubmit={handleSubmit} />
       </div>
-      <div className="grid grid-cols-2 gap-16 pt-16">
+      <div className="grid grid-cols-2 gap-16 pt-24">
         <div className="space-y-2">
           <Notes
             control={control}
