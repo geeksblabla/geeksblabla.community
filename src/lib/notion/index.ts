@@ -35,7 +35,7 @@ export async function getGeekBlablaEpisodesPlannings(): Promise<NotionNormalized
   }
 
   const episodes = (await getNotionClient().databases.query({
-    database_id: databaseId,
+    database_id: databaseId as string,
     filter: {
       or: [
         {
@@ -247,7 +247,7 @@ export async function addNewEpisodeToNotion({
     const response = await notion.pages.create({
       parent: {
         type: "database_id",
-        database_id: databaseId,
+        database_id: databaseId as string,
       },
       properties: {
         title: {

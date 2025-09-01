@@ -17,10 +17,15 @@ import { getAstroRedirects } from "./src/redirects";
 import cloudflare from "@astrojs/cloudflare";
 
 const envSchema = {
-  NOTION_API_KEY: envField.string({ context: "server", access: "secret" }),
+  NOTION_API_KEY: envField.string({
+    context: "server",
+    access: "secret",
+    optional: true,
+  }),
   GEEKSBLABLA_NOTION_DATABASE_ID: envField.string({
     context: "server",
     access: "secret",
+    optional: true,
   }),
   YOUTUBE_API_KEY: envField.string({
     context: "server",
