@@ -63,7 +63,9 @@ export const GenerateWithAIButton = ({
       onClick={handleGenerateWithAI}
       disabled={isLoading || !youtubeUrl}
     >
-      {isLoading ? "Generating..." : "Generate with AI"}
+      {isLoading
+        ? "Generating Notes and Description..."
+        : "Generate Notes and Description with AI"}
     </button>
   );
 };

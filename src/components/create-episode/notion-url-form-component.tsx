@@ -1,13 +1,7 @@
-import { actions } from "astro:actions";
-import { getDefaultValues, type FormValues } from "./schema";
-
+import { extractNotionPageId } from "@/lib/notion-utils";
 import { useState } from "react";
 
-export function NotionUrlSearch({
-  onDataFetch,
-}: {
-  onDataFetch: (data: FormValues) => void;
-}) {
+export default function NotionUrlFormComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,47 +12,18 @@ export function NotionUrlSearch({
 
     const formData = new FormData(e.currentTarget);
     const url = formData.get("notionUrl") as string;
-    const { error, data } = await actions.getEpisodeDetails({ url });
 
-    if (error) {
+    // Extract the Notion page ID from the URL
+    const pageId = extractNotionPageId(url);
+
+    if (!pageId) {
       setIsLoading(false);
-      setError("Failed to fetch episode details. Please try again.");
-      return;
-    }
-    const missingFields = [];
-    if (!data.youtube || !data.duration || !data.publishedAt) {
-      missingFields.push("YouTube URL");
-    }
-    if (data.guests?.length) {
-      const guestsWithoutUrls = data.guests.filter(guest => !guest.url);
-      if (guestsWithoutUrls.length > 0) {
-        missingFields.push(
-          `URLs for guests: ${guestsWithoutUrls.map(g => g.title).join(", ")}`
-        );
-      }
-    }
-    if (missingFields.length > 0) {
-      setIsLoading(false);
-      setError(
-        `Missing required fields from episode details. Please ensure the Notion page has the following: ${missingFields.join(", ")}`
-      );
+      setError("Invalid Notion URL. Please provide a valid Notion page URL.");
       return;
     }
 
-    const defaultValues = getDefaultValues();
-    const episodeData = {
-      ...defaultValues,
-      title: data.title,
-      date: new Date(data.publishedAt || data.date),
-      youtube: data.youtube,
-      category: data.category,
-      guests: data.guests,
-      hosts: data.hosts,
-      description: data.description,
-      duration: data.duration,
-      episodeNumber: data.episodeNumber?.toString() || "0",
-    };
-    onDataFetch({ ...episodeData, duration: episodeData.duration as string });
+    // Redirect to the form page with the Notion page ID
+    window.location.href = `/podcast/new/${pageId}`;
     setIsLoading(false);
   };
 
@@ -109,7 +74,7 @@ export function NotionUrlSearch({
                   </svg>
                 </span>
               ) : (
-                "Search"
+                "Continue"
               )}
             </button>
           </div>

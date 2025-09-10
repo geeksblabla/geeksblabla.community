@@ -13,6 +13,7 @@ import { episodeSchemaForm } from "./schema";
 import { AddIcon, RemoveIcon } from "./icons";
 import TimestampInput from "./timestamp-input";
 import { timestampToSeconds } from "@/lib/youtube";
+import { GenerateWithAIButton } from "./generate-with-ai-button";
 
 type FormValues = z.infer<typeof episodeSchemaForm>;
 
@@ -111,61 +112,93 @@ export default function Notes({
       </div>
 
       <div className="space-y-4">
-        {noteFields.map((field, index) => (
-          <div key={field.id}>
-            <div className="group relative flex items-start gap-4">
-              <TimestampInput
-                onChange={value => {
-                  setValue(`notes.${index}.timestamp`, value);
-                  triggerOrderValidation();
-                }}
-                defaultValue={field.timestamp}
-                id={`notes.${index}.timestamp`}
-              />
-
-              <div className="flex-1">
-                <input
-                  {...register(`notes.${index}.content`)}
-                  placeholder="Add your note here..."
-                  className="w-full border-0 bg-transparent p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0"
-                />
+        {noteFields.length === 0 ? (
+          <div className="space-y-4">
+            <div className="py-8 text-center text-gray-500">
+              <p className="mb-4">
+                No notes yet. Generate notes with AI or add manually.
+              </p>
+              <GenerateWithAIButton setValue={setValue} watch={watch} />
+            </div>
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-gray-50 px-3 py-1.5"
+              onClick={() => {
+                appendNote({ timestamp: getNextTimestamp(notes), content: "" });
+              }}
+            >
+              <span>Add Note Manually</span>
+              <div className="flex gap-1">
+                <AddIcon />
               </div>
+            </button>
+          </div>
+        ) : (
+          <>
+            {noteFields.map((field, index) => (
+              <div key={field.id}>
+                <div className="group relative flex items-start gap-4">
+                  <TimestampInput
+                    onChange={value => {
+                      setValue(`notes.${index}.timestamp`, value);
+                      triggerOrderValidation();
+                    }}
+                    defaultValue={field.timestamp}
+                    id={`notes.${index}.timestamp`}
+                  />
 
-              <RemoveIcon
-                className="h-4 w-4"
-                onClick={() => removeNote(index)}
-              />
-            </div>
+                  <div className="flex-1">
+                    <textarea
+                      {...register(`notes.${index}.content`)}
+                      placeholder="Add your note here..."
+                      className="min-h-[1.5rem] w-full resize-none border-0 bg-transparent p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0"
+                      rows={1}
+                      onInput={e => {
+                        const target = e.target as HTMLTextAreaElement;
+                        target.style.height = "auto";
+                        target.style.height = target.scrollHeight + "px";
+                      }}
+                    />
+                  </div>
+
+                  <RemoveIcon
+                    className="h-4 w-4"
+                    onClick={() => removeNote(index)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  {errors.notes?.[index]?.timestamp?.message && (
+                    <div className="text-sm text-red-500">
+                      {errors.notes?.[index]?.timestamp?.message}
+                    </div>
+                  )}
+                  {errors.notes?.[index]?.content?.message && (
+                    <div className="text-sm text-red-500">
+                      {errors.notes?.[index]?.content?.message}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
             <div className="space-y-1">
-              {errors.notes?.[index]?.timestamp?.message && (
+              {errors.notes?.message && (
                 <div className="text-sm text-red-500">
-                  {errors.notes?.[index]?.timestamp?.message}
-                </div>
-              )}
-              {errors.notes?.[index]?.content?.message && (
-                <div className="text-sm text-red-500">
-                  {errors.notes?.[index]?.content?.message}
+                  {errors.notes?.message}
                 </div>
               )}
             </div>
-          </div>
-        ))}
-        <div className="space-y-1">
-          {errors.notes?.message && (
-            <div className="text-sm text-red-500">{errors.notes?.message}</div>
-          )}
-        </div>
-        <button
-          className="flex items-center gap-2 rounded-md bg-gray-50 px-3 py-1.5"
-          onClick={() => {
-            appendNote({ timestamp: getNextTimestamp(notes), content: "" });
-          }}
-        >
-          <span>Add Note</span>
-          <div className="flex gap-1">
-            <AddIcon />
-          </div>
-        </button>
+            <button
+              className="flex items-center gap-2 rounded-md bg-gray-50 px-3 py-1.5"
+              onClick={() => {
+                appendNote({ timestamp: getNextTimestamp(notes), content: "" });
+              }}
+            >
+              <span>Add Note</span>
+              <div className="flex gap-1">
+                <AddIcon />
+              </div>
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

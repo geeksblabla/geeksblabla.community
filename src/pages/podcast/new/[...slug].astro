@@ -1,0 +1,19 @@
+---
+import Layout from "@/components/layout.astro";
+import EpisodeForm from "@/components/create-episode/episode-form.astro";
+import PreventClose from "@/components/prevent-close.astro";
+import { isValidNotionPageId } from "@/lib/notion-utils";
+export const prerender = false;
+const { slug } = Astro.params;
+const notionId = Array.isArray(slug) ? slug[0] : slug;
+
+// Validate the Notion page ID
+if (!notionId || !isValidNotionPageId(notionId)) {
+  return Astro.redirect("/podcast/new");
+}
+---
+
+<Layout>
+  {!import.meta.env.DEV && <PreventClose />}
+  <EpisodeForm notionId={notionId} />
+</Layout>

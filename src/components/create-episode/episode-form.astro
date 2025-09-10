@@ -1,0 +1,15 @@
+---
+import CompleteFormComponent from "./episode-form.tsx";
+
+interface Props {
+  notionId: string;
+}
+
+const { notionId } = Astro.props;
+---
+
+<div class="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+  <main class="main py-16 pt-8">
+    <CompleteFormComponent notionId={notionId} client:load />
+  </main>
+</div>

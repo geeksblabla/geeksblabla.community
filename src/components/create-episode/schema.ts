@@ -15,7 +15,11 @@ export const episodeCategorySchema = z.enum([
 
 export const linkSchema = z.object({
   title: z.string(),
-  url: z.string().url(),
+  url: z
+    .string()
+    .refine(val => val === "#" || z.string().url().safeParse(val).success, {
+      message: "Invalid URL. Must be a valid URL or '#'",
+    }),
 });
 
 const noteSchema = z.object({
@@ -37,6 +41,7 @@ const episodeSchemaBase = z.object({
   youtube: z.string().url(),
   published: z.boolean(),
   featured: z.boolean().optional().default(false),
+  episodeNumber: z.string().optional().default("0"),
 });
 
 export const episodeSchemaForm = episodeSchemaBase.extend({
@@ -62,27 +67,9 @@ export const DEFAULT_VALUES = {
   featured: false,
 };
 
-export const getDefaultValues = (duration: string) => {
-  const [hours, minutes, seconds] = duration.split(":").map(Number);
-  const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-  const intervalSeconds = Math.floor(totalSeconds / 5);
-
-  const notes = Array.from({ length: 4 }, (_, index) => {
-    const noteSeconds = intervalSeconds * (index + 1);
-    const noteHours = Math.floor(noteSeconds / 3600);
-    const noteMinutes = Math.floor((noteSeconds % 3600) / 60);
-    const noteRemainingSeconds = noteSeconds % 60;
-
-    return {
-      timestamp: `${String(noteHours).padStart(2, "0")}:${String(noteMinutes).padStart(2, "0")}:${String(noteRemainingSeconds).padStart(2, "0")}`,
-      content: "",
-    };
-  });
+export const getDefaultValues = () => {
   return {
     ...DEFAULT_VALUES,
-    notes: [
-      { timestamp: "00:00:00", content: "Intro and welcoming guests" },
-      ...notes,
-    ],
+    notes: [],
   } satisfies Partial<FormValues>;
 };

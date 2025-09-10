@@ -43,7 +43,11 @@ export const getYoutubeVideoDetails = async (url: string, apiKey: string) => {
       // Parse duration from ISO 8601 format
       const isoDuration = data.items[0].contentDetails.duration;
       const duration = parseIsoDurationToHHMMSS(isoDuration);
-
+      console.log(data.items[0]);
+      const title = data.items[0].snippet.title;
+      // Extract episode number after '#' (e.g., "#223 - ...")
+      const episodeNumberMatch = title.match(/#(\d+)/) as number[];
+      const episodeNumber = episodeNumberMatch ? episodeNumberMatch[1] : 0;
       // Get published date
       const publishedAt = new Date(data.items[0].snippet.publishedAt)
         .toISOString()
@@ -53,6 +57,7 @@ export const getYoutubeVideoDetails = async (url: string, apiKey: string) => {
         duration,
         publishedAt,
         youtube: `https://www.youtube.com/watch?v=${videoId}`,
+        episodeNumber,
       };
     }
   } catch (error) {
