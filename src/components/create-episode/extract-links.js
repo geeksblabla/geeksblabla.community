@@ -54,12 +54,16 @@ async function main() {
   }
   const videoDuration = video.duration;
   // Seek through video in 15-minute intervals and extract links
-  const fifteenMinutesInSeconds = 15 * 60;
-  let currentTime = 15 * 60;
+  const intervalInSeconds = 15 * 60;
 
-  while (currentTime < videoDuration) {
+  const stops = Array.from(
+    { length: Math.floor(videoDuration / intervalInSeconds) },
+    (_, i) => i * intervalInSeconds
+  ).concat(videoDuration - 30);
+
+  for (const stop of stops) {
     // Seek to current timestamp
-    video.currentTime = currentTime;
+    video.currentTime = stop;
 
     // Wait for video to seek and DOM to update
     await new Promise(resolve => setTimeout(resolve, 5000));
@@ -67,16 +71,7 @@ async function main() {
     // Extract links at current timestamp
     const timestampLinks = extractLinksFromMessages();
     links.push(...timestampLinks);
-    console.log(
-      "Seeking to",
-      currentTime,
-      ". found ",
-      timestampLinks.length,
-      "links"
-    );
-
-    // Move forward 15 minutes
-    currentTime += fifteenMinutesInSeconds;
+    console.log("Seeking to", stop, ". found ", timestampLinks.length, "links");
   }
 
   // Deduplicate links
