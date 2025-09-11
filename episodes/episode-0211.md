@@ -67,8 +67,7 @@ Dive into the world of Vibe Coding! In this episode, we explore the latest AI tr
 - [Windsurf Editor | Windsurf](https://windsurf.com/editor)
 - [Google](https://openrouter.ai/)
 - [Lovable](https://lovable.dev/?via=cuong)
-- [Firebase Studio](https://studio.firebase.google.com/?pli=1
-)
+- [Firebase Studio](https://studio.firebase.google.com/)
 
 ## Prepared and Presented by
 
