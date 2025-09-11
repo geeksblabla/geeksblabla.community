@@ -193,10 +193,10 @@ function validateEpisodeMarkdown(input) {
         !lines[currentLine].startsWith("##")
       ) {
         const line = lines[currentLine].trim();
-        if (line && !line.match(/^[0-9]?[0-9]:[0-9]{2}:[0-9]{2} - .+/)) {
+        if (line && !line.match(/^[0-9]?[0-9]:[0-9]{2}:[0-9]{2} [-–] .+/)) {
           errors.push({
             line: currentLine + 1,
-            message: `Invalid note format: "${line}". Expected format: "HH:MM:SS - Description"`,
+            message: `Invalid note format: "${line}". Expected format: "HH:MM:SS - Description" or "HH:MM:SS – Description"`,
           });
         }
         currentLine++;
