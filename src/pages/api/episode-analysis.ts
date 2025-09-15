@@ -40,7 +40,7 @@ Carefully analyze the content to identify the key topics and transitions.
 Generate a concise YouTube video description (max 400 characters) and a list of chapters with accurate timestamps (HH:MM:SS format).
 Ensure timestamps align with the actual start of each topic and cover all major discussion points.
 The chapters should be in english.
-ALWAYS start the first note at 00:00:00 and make sure to not exceed 20 notes.`;
+ALWAYS start the first note at 00:00:00 and make sure to not exceed 30 notes.`;
 
 // GET endpoint that takes YouTube URL as query parameter and returns JSON
 export const GET: APIRoute = async ({ request }) => {
