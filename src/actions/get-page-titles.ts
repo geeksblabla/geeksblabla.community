@@ -1,5 +1,16 @@
 import { defineAction, ActionError } from "astro:actions";
 import { z } from "astro:schema";
+import metascraper from "metascraper";
+import metascraperTitle from "metascraper-title";
+import metascraperDescription from "metascraper-description";
+import metascraperUrl from "metascraper-url";
+
+// Initialize metascraper with rules
+const scraper = metascraper([
+  metascraperTitle(),
+  metascraperDescription(),
+  metascraperUrl(),
+]);
 
 export const getPageTitles = defineAction({
   accept: "json",
@@ -15,16 +26,24 @@ export const getPageTitles = defineAction({
           try {
             const response = await fetch(url);
             if (!response.ok) {
-              console.warn(`Failed to fetch ${url}`);
-              return { url, title: "Not found" };
+              console.warn(
+                `Failed to fetch ${url}: ${response.status} ${response.statusText}`
+              );
+              return { url, title: "Not found", description: null };
             }
-            const text = await response.text();
-            const titleMatch = text.match(/<title>(.*?)<\/title>/i);
-            const title = titleMatch ? titleMatch[1] : "No title found";
-            return { url, title };
+
+            const html = await response.text();
+            const metadata = await scraper({ html, url });
+
+            return {
+              url,
+              title: metadata.title || "No title found",
+              description: metadata.description || null,
+              canonicalUrl: metadata.url || url,
+            };
           } catch (error) {
             console.warn(`Error fetching ${url}:`, error);
-            return { url, title: "Not found" };
+            return { url, title: "Not found", description: null };
           }
         })
       );
