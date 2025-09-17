@@ -57,6 +57,7 @@ Join us for an insightful conversation with Nate, the Kaggle team lead at Google
 
 ## Links
 
+- [Google Deveelopers](https://goo.gle/4kH6RLI)
 
 
 ## Prepared and Presented by
