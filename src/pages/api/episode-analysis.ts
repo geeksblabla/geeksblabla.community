@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+// import type { APIRoute } from "astro";
 // import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { OPEN_ROUTER_API_KEY, SUPADATA_API_KEY } from "astro:env/server";
@@ -43,7 +43,7 @@ The chapters should be in english.
 ALWAYS start the first note at 00:00:00 and make sure to not exceed 30 notes.`;
 
 // GET endpoint that takes YouTube URL as query parameter and returns JSON
-export const GET: APIRoute = async ({ request }) => {
+export const GET = async ({ request }: { request: Request }) => {
   try {
     // Validate environment variables
     if (!OPEN_ROUTER_API_KEY) {
@@ -107,6 +107,73 @@ export const GET: APIRoute = async ({ request }) => {
     // Convert transcript data to SRT format for AI processing
     const content = convertToSRT(transcriptData);
     console.log("Subtitle content length:", content.length);
+    console.log("Transcript segments count:", transcriptData.length);
+
+    // Validate transcript content before sending to LLM
+    if (!content || content.length < 100) {
+      return new Response(
+        JSON.stringify({
+          error: "Insufficient Content",
+          message:
+            "The transcript content is too short or empty. Please ensure the video has subtitles available.",
+          details: `Content length: ${content.length} characters`,
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    // Check if transcript contains meaningful content (not just error messages)
+    if (
+      content.includes("Error: Invalid transcript data format") ||
+      content.trim() === "" ||
+      !transcriptData ||
+      transcriptData.length === 0
+    ) {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid Transcript",
+          message:
+            "Unable to retrieve valid transcript data. The video may not have subtitles available or may be private.",
+          details: "No valid transcript segments found",
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    // Additional validation: Check if content has minimum word count for meaningful analysis
+    const wordCount = content
+      .split(/\s+/)
+      .filter(word => word.length > 0).length;
+    console.log("Transcript word count:", wordCount);
+
+    if (wordCount < 50) {
+      return new Response(
+        JSON.stringify({
+          error: "Insufficient Content",
+          message:
+            "The transcript content is too short for meaningful analysis. Please provide a longer video with more content.",
+          details: `Word count: ${wordCount} words (minimum: 50 words required)`,
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    console.log("Transcript validation passed - proceeding with LLM analysis");
 
     const openrouter = createOpenRouter({
       apiKey: OPEN_ROUTER_API_KEY as string,
