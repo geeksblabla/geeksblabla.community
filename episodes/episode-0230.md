@@ -40,7 +40,7 @@ Join our monthly AMA & Tech News episode! We dive into the complexities of time 
 
 00:30:40 - Open IP: A New Approach to Intellectual Property
 
-00:35:00 - Linux on the Desktop: Aworchi, Distro Hopping, and User Experience
+00:35:00 - Linux on the Desktop: Omarchy, Distro Hopping, and User Experience
 
 00:41:35 - The Burden of Legacy Compatibility in Windows (GTA Example)
 
