@@ -13,7 +13,7 @@ Dive into cybersecurity with experts Mehdi and Bouchra! We break down the comple
 
 ## Guests
 
-- [Mehdi Benabdelkader](https://www.linkedin.com/in/mehdibenabdelkader/)[
+- [Mehdi Benabdelkader](https://www.linkedin.com/in/mehdibenabdelkader/)
 - [Bochra Labiad](https://www.linkedin.com/in/justbochra/)
 
 ## Notes
