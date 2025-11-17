@@ -36,7 +36,7 @@ Dive into the world of Linux ricing! We explore how to customize your desktop fo
 
 00:39:20 - Managing Your Dotfiles: Ansible, Nix, and Stow
 
-00:45:01 - The Omakarch Phenomenon: Democratizing Arch Linux?
+00:45:01 - The Omarchy Phenomenon: Democratizing Arch Linux?
 
 00:52:54 - Is Arch Linux Stable or Breakable?
 
