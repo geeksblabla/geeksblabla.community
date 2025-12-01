@@ -4,7 +4,13 @@ import { generateObject } from "ai";
 import { OPEN_ROUTER_API_KEY, SUPADATA_API_KEY } from "astro:env/server";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { z } from "zod";
-import { fetchYouTubeSubtitles, convertToSRT } from "../../lib/youtube";
+import {
+  fetchYouTubeSubtitles,
+  convertToSRT,
+  calculateVideoDuration,
+  formatDuration,
+  getRecommendedNoteCount,
+} from "../../lib/youtube";
 
 export const runtime = "edge";
 export const prerender = false;
@@ -23,10 +29,14 @@ const AnalysisResultSchema = z.object({
   notes: z
     .array(
       z.object({
-        timestamp: z
-          .string()
-          .regex(/^\d{2}:\d{2}:\d{2}$/)
-          .describe("Timestamp in HH:MM:SS format"),
+        timestamp: z.string().regex(/^\d{2}:\d{2}:\d{2}$/)
+          .describe(`Timestamp in HH:MM:SS format:  CRITICAL TIMESTAMP RULES:
+1. Use the EXACT timestamps from the SRT subtitle file - DO NOT make up or estimate timestamps
+2. Each timestamp MUST correspond to where that topic actually begins in the subtitle file
+3. Timestamps MUST be in strictly chronological order (each timestamp must be later than the previous one)
+4. Format MUST be HH:MM:SS (e.g., 00:05:30 for 5 minutes 30 seconds, NOT 05:30:00)
+5. ALWAYS start the first note at 00:00:00
+6. Maximum 30 notes total`),
         content: z.string().describe("Clear and engaging chapter title"),
       })
     )
@@ -35,12 +45,94 @@ const AnalysisResultSchema = z.object({
     ),
 });
 
-const ANALYSIS_PROMPT = `You are given an automated subtitle file of a podcast episode.
-Carefully analyze the content to identify the key topics and transitions.
-Generate a concise YouTube video description (max 400 characters) and a list of chapters with accurate timestamps (HH:MM:SS format).
-Ensure timestamps align with the actual start of each topic and cover all major discussion points.
-The chapters should be in english.
-ALWAYS start the first note at 00:00:00 and make sure to not exceed 30 notes.`;
+// Helper function to create dynamic analysis prompt based on video duration
+const createAnalysisPrompt = (
+  durationSeconds: number,
+  recommendedNotes: { min: number; target: number; max: number }
+) => {
+  const durationFormatted = formatDuration(durationSeconds);
+  const durationMinutes = Math.floor(durationSeconds / 60);
+
+  return `You are given an automated subtitle file (SRT format) of a podcast episode with precise timestamps.
+The video duration is ${durationFormatted} (${durationMinutes} minutes).
+
+Your task:
+1. Generate a concise YouTube video description (max 400 characters) that summarizes the episode clearly and attracts viewers
+2. Create ${recommendedNotes.target} chapter notes (between ${recommendedNotes.min}-${recommendedNotes.max} notes) with accurate timestamps
+
+CRITICAL COVERAGE REQUIREMENTS:
+- MUST cover the ENTIRE video from start (00:00:00) to end (${durationFormatted})
+- First note MUST start at 00:00:00
+- Last note should be within the final 15% of the video (after ${formatDuration(Math.floor(durationSeconds * 0.85))})
+- Distribute notes evenly throughout the video - DO NOT cluster all notes at the beginning
+- Aim for approximately 1 note every 6-8 minutes
+
+CRITICAL TIMESTAMP RULES:
+1. Use the EXACT timestamps from the SRT subtitle file - DO NOT make up or estimate timestamps
+2. Each timestamp MUST correspond to where that topic actually begins in the subtitle file
+3. Timestamps MUST be in strictly chronological order (each timestamp must be later than the previous one)
+4. Format MUST be HH:MM:SS (e.g., 00:05:30 for 5 minutes 30 seconds, NOT 05:30:00)
+5. Double-check each timestamp against the subtitle timing before including it
+
+The chapters should be in english and cover all major discussion points throughout the entire video.`;
+};
+
+// Helper function to parse HH:MM:SS to seconds
+const parseTimestamp = (timestamp: string): number => {
+  const [hours, minutes, seconds] = timestamp.split(":").map(Number);
+  return hours * 3600 + minutes * 60 + seconds;
+};
+
+// Validation interface
+interface ValidationResult {
+  isValid: boolean;
+  warnings: string[];
+}
+
+// Validation function to check coverage and note quality
+const validateNotes = (
+  notes: Array<{ timestamp: string; content: string }>,
+  durationSeconds: number,
+  recommendedCount: { min: number; target: number; max: number }
+): ValidationResult => {
+  const warnings: string[] = [];
+
+  // Check if first note starts at 00:00:00
+  if (notes.length > 0 && notes[0].timestamp !== "00:00:00") {
+    warnings.push(
+      `First note should start at 00:00:00 but starts at ${notes[0].timestamp}`
+    );
+  }
+
+  // Check if last note is within final 15% of video
+  if (notes.length > 0) {
+    const lastNote = notes[notes.length - 1];
+    const lastNoteSeconds = parseTimestamp(lastNote.timestamp);
+    const minLastNoteTime = durationSeconds * 0.85;
+
+    if (lastNoteSeconds < minLastNoteTime) {
+      warnings.push(
+        `Last note at ${lastNote.timestamp} ends too early. Video duration is ${formatDuration(durationSeconds)}, but coverage ends at ${((lastNoteSeconds / durationSeconds) * 100).toFixed(0)}% of the video.`
+      );
+    }
+  }
+
+  // Check note count
+  if (notes.length < recommendedCount.min) {
+    warnings.push(
+      `Only ${notes.length} notes generated. Recommended: ${recommendedCount.min}-${recommendedCount.max} notes for better coverage.`
+    );
+  } else if (notes.length > recommendedCount.max) {
+    warnings.push(
+      `${notes.length} notes generated. This might be too many. Recommended: ${recommendedCount.min}-${recommendedCount.max} notes.`
+    );
+  }
+
+  return {
+    isValid: warnings.length === 0,
+    warnings,
+  };
+};
 
 // GET endpoint that takes YouTube URL as query parameter and returns JSON
 export const GET = async ({ request }: { request: Request }) => {
@@ -175,11 +267,22 @@ export const GET = async ({ request }: { request: Request }) => {
 
     console.log("Transcript validation passed - proceeding with LLM analysis");
 
+    // Calculate video duration and get recommendations
+    const durationSeconds = calculateVideoDuration(transcriptData);
+    const recommendedCount = getRecommendedNoteCount(durationSeconds);
+    console.log("Video duration:", formatDuration(durationSeconds));
+    console.log("Recommended note count:", recommendedCount);
+
     const openrouter = createOpenRouter({
       apiKey: OPEN_ROUTER_API_KEY as string,
     });
 
-    const prompt = `${ANALYSIS_PROMPT}\n\nSubtitle content: <subtitle>\n${content}\n</subtitle>`;
+    // Create dynamic prompt with duration context
+    const analysisPrompt = createAnalysisPrompt(
+      durationSeconds,
+      recommendedCount
+    );
+    const prompt = `${analysisPrompt}\n\nSubtitle content: <subtitle>\n${content}\n</subtitle>`;
     console.log("Prompt length:", prompt.length);
 
     // Generate analysis using OpenRouter with structured output
@@ -195,13 +298,36 @@ export const GET = async ({ request }: { request: Request }) => {
       });
       console.log("Analysis result:", result.object);
 
-      return new Response(JSON.stringify(result.object), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=3600", // Cache for 1 hour
-        },
-      });
+      // Validate the generated notes
+      const validation = validateNotes(
+        result.object.notes,
+        durationSeconds,
+        recommendedCount
+      );
+      console.log("Validation result:", validation);
+
+      // Return response with metadata
+      return new Response(
+        JSON.stringify({
+          ...result.object,
+          metadata: {
+            videoDuration: formatDuration(durationSeconds),
+            videoDurationSeconds: durationSeconds,
+            notesGenerated: result.object.notes.length,
+            notesRecommended: recommendedCount,
+            validation: {
+              isValid: validation.isValid,
+              warnings: validation.warnings,
+            },
+          },
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     } catch (aiError) {
       console.error("AI generation error:", aiError);
       throw new Error(

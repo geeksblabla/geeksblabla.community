@@ -156,3 +156,58 @@ export const convertToSRT = (transcriptData: TranscriptSegment[]): string => {
 
   return srtContent.trim();
 };
+
+/**
+ * Calculate total video duration from transcript segments
+ * @param transcriptData Array of transcript segments
+ * @returns Duration in seconds
+ */
+export const calculateVideoDuration = (
+  transcriptData: TranscriptSegment[]
+): number => {
+  if (!transcriptData || transcriptData.length === 0) {
+    return 0;
+  }
+
+  // Find the last segment and calculate total duration
+  const lastSegment = transcriptData[transcriptData.length - 1];
+  const totalMilliseconds = lastSegment.offset + lastSegment.duration;
+
+  return Math.floor(totalMilliseconds / 1000); // Convert to seconds
+};
+
+/**
+ * Format seconds to HH:MM:SS
+ * @param seconds Total seconds
+ * @returns Formatted time string
+ */
+export const formatDuration = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+};
+
+/**
+ * Calculate recommended note count based on video duration
+ * Target: 1 note every 6-8 minutes
+ */
+export const getRecommendedNoteCount = (
+  durationSeconds: number
+): {
+  min: number;
+  target: number;
+  max: number;
+} => {
+  const durationMinutes = durationSeconds / 60;
+
+  // Target: 1 note per ~7 minutes
+  const target = Math.round(durationMinutes / 7);
+
+  // Min: 1 note per 8 minutes, Max: 1 note per 6 minutes
+  const min = Math.max(3, Math.floor(durationMinutes / 8));
+  const max = Math.min(30, Math.ceil(durationMinutes / 6));
+
+  return { min, target, max };
+};
