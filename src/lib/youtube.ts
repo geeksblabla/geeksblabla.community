@@ -203,11 +203,11 @@ export const getRecommendedNoteCount = (
   const durationMinutes = durationSeconds / 60;
 
   // Target: 1 note per ~7 minutes
-  const target = Math.round(durationMinutes / 7);
+  const target = Math.round(durationMinutes / 5);
 
-  // Min: 1 note per 8 minutes, Max: 1 note per 6 minutes
-  const min = Math.max(3, Math.floor(durationMinutes / 8));
-  const max = Math.min(30, Math.ceil(durationMinutes / 6));
+  // Min: 1 note per 6 minutes, Max: 4 note per 4 minutes
+  const min = Math.max(3, Math.floor(durationMinutes / 6));
+  const max = Math.min(40, Math.ceil(durationMinutes / 4));
 
   return { min, target, max };
 };

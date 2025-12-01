@@ -29,14 +29,12 @@ const AnalysisResultSchema = z.object({
   notes: z
     .array(
       z.object({
-        timestamp: z.string().regex(/^\d{2}:\d{2}:\d{2}$/)
-          .describe(`Timestamp in HH:MM:SS format:  CRITICAL TIMESTAMP RULES:
-1. Use the EXACT timestamps from the SRT subtitle file - DO NOT make up or estimate timestamps
-2. Each timestamp MUST correspond to where that topic actually begins in the subtitle file
-3. Timestamps MUST be in strictly chronological order (each timestamp must be later than the previous one)
-4. Format MUST be HH:MM:SS (e.g., 00:05:30 for 5 minutes 30 seconds, NOT 05:30:00)
-5. ALWAYS start the first note at 00:00:00
-6. Maximum 30 notes total`),
+        timestamp: z
+          .string()
+          .regex(/^\d{2}:\d{2}:\d{2}$/)
+          .describe(
+            "Timestamp in HH:MM:SS format (e.g., 00:05:30 for 5 minutes 30 seconds)"
+          ),
         content: z.string().describe("Clear and engaging chapter title"),
       })
     )
@@ -64,8 +62,15 @@ CRITICAL COVERAGE REQUIREMENTS:
 - MUST cover the ENTIRE video from start (00:00:00) to end (${durationFormatted})
 - First note MUST start at 00:00:00
 - Last note should be within the final 15% of the video (after ${formatDuration(Math.floor(durationSeconds * 0.85))})
-- Distribute notes evenly throughout the video - DO NOT cluster all notes at the beginning
-- Aim for approximately 1 note every 6-8 minutes
+
+DISTRIBUTION REQUIREMENTS:
+- Divide the video into roughly equal segments
+- For a ${durationMinutes}-minute video with ${recommendedNotes.target} notes:
+  * Target spacing: 1 note every ~${Math.round(durationMinutes / recommendedNotes.target)} minutes
+  * Maximum gap allowed: ${Math.round((durationMinutes / recommendedNotes.target) * 1.8)} minutes between any two consecutive notes
+- Pay EXTRA attention to the middle and final sections of the video
+- Common mistake to avoid: DO NOT generate 80% of notes in the first half of the video
+- Ensure roughly equal distribution: If video is 2 hours and you need 20 notes, don't put 15 notes in the first hour
 
 CRITICAL TIMESTAMP RULES:
 1. Use the EXACT timestamps from the SRT subtitle file - DO NOT make up or estimate timestamps
@@ -88,6 +93,44 @@ interface ValidationResult {
   isValid: boolean;
   warnings: string[];
 }
+
+/**
+ * Check for uneven distribution by detecting large gaps between consecutive notes
+ */
+const detectGaps = (
+  notes: Array<{ timestamp: string; content: string }>,
+  durationSeconds: number,
+  targetNotesCount: number
+): { maxGap: number; maxGapLocation: string; hasProblematicGaps: boolean } => {
+  if (notes.length < 2) {
+    return { maxGap: 0, maxGapLocation: "", hasProblematicGaps: false };
+  }
+
+  const targetSpacing = durationSeconds / targetNotesCount; // Expected average spacing
+  const maxAllowedGap = targetSpacing * 2; // Flag gaps that are 2x the target
+
+  let maxGap = 0;
+  let maxGapStart = "";
+  let maxGapEnd = "";
+
+  for (let i = 1; i < notes.length; i++) {
+    const prevSeconds = parseTimestamp(notes[i - 1].timestamp);
+    const currSeconds = parseTimestamp(notes[i].timestamp);
+    const gap = currSeconds - prevSeconds;
+
+    if (gap > maxGap) {
+      maxGap = gap;
+      maxGapStart = notes[i - 1].timestamp;
+      maxGapEnd = notes[i].timestamp;
+    }
+  }
+
+  return {
+    maxGap,
+    maxGapLocation: `${maxGapStart} → ${maxGapEnd}`,
+    hasProblematicGaps: maxGap > maxAllowedGap,
+  };
+};
 
 // Validation function to check coverage and note quality
 const validateNotes = (
@@ -125,6 +168,20 @@ const validateNotes = (
   } else if (notes.length > recommendedCount.max) {
     warnings.push(
       `${notes.length} notes generated. This might be too many. Recommended: ${recommendedCount.min}-${recommendedCount.max} notes.`
+    );
+  }
+
+  // Check for large gaps between consecutive notes
+  const gapAnalysis = detectGaps(
+    notes,
+    durationSeconds,
+    recommendedCount.target
+  );
+
+  if (gapAnalysis.hasProblematicGaps) {
+    const maxGapMinutes = Math.round(gapAnalysis.maxGap / 60);
+    warnings.push(
+      `Large gap detected: ${maxGapMinutes} minutes between notes at ${gapAnalysis.maxGapLocation}. This section may be under-covered.`
     );
   }
 
