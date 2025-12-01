@@ -19,47 +19,67 @@ Dive deep into AI's impact on developers! Is it a learning partner or a crutch? 
 
 ## Notes
 
-00:00:00 - Introduction: AMA & Tech News
+00:00:00 - Intro: AMA & Tech News Roundup
 
-00:02:45 - Guest Introductions
+00:02:59 - Introducing the Guests
 
-00:04:50 - The Rise of DevOps in the Community
+00:04:53 - Why Are There So Many DevOps Engineers on the Podcast?
 
-00:06:59 - Learning: Container Security & Homelabs
+00:07:04 - What We're Learning: "Container Security" Book
 
-00:09:55 - Revisiting Virtualization & Using AI as a Learning Partner
+00:08:30 - Building a Home Lab with a NAS (Network Attached Storage)
 
-00:13:12 - The Power and Pitfalls of Learning with AI
+00:10:58 - Using AI as a Learning Partner to Revisit Basics
 
-00:17:19 - What is "Code Freeze" in Big Tech?
+00:15:01 - The Challenge of Getting Working Code from AI
 
-00:20:35 - Experimenting with AI: Fine-Tuning vs. Advanced Prompting
+00:17:26 - What is a "Code Freeze" and Why Do Companies Do It?
 
-00:23:49 - Do You Copy-Paste Code from AI?
+00:20:35 - Experimenting with Fine-Tuning vs. Prompt Engineering
 
-00:31:16 - Will AI Widen the Gap Between Junior & Senior Developers?
+00:23:49 - Do You Copy-Paste Code Directly from AI?
 
-00:36:50 - Are We Forgetting How to Code Because of AI?
+00:27:21 - How AI Agents Understand Your Project's Context
 
-00:41:09 - The AI Alignment Problem: Ethics & Control
+00:31:16 - Does AI Widen the Gap Between Junior & Senior Developers?
 
-00:45:43 - The Future of Human Cognition in the Age of AI
+00:36:50 - Will We Forget How to Code Because of AI?
 
-01:00:05 - NAS vs. Building Your Own Storage Server
+00:41:11 - The Ethical Dilemma: Can AI Operate Autonomously?
 
-01:01:41 - Essential Skills for a Junior DevOps Engineer
+00:45:43 - The Alignment Problem: AI's Single-Minded Focus
 
-01:07:12 - The SRE & Platform Engineering Scene in Morocco
+00:50:10 - How AI Challenges the Traditional Education System
 
-01:13:34 - Tech News: The AI War (Gemini, Claude 3, etc.)
+00:54:49 - The Risk of Relying on AI Without Critical Thinking
 
-01:24:50 - NPM Security Incidents & Supply Chain Attacks
+01:01:43 - What Are the Core Skills for a DevOps Engineer?
 
-01:41:26 - A Look at Alternative Tech Schools: 1337 & YouCode
+01:07:15 - The SRE & Platform Engineering Scene in Morocco
 
-02:03:43 - Is Vacation a Solution or an Escape from Burnout?
+01:11:53 - Is the Moroccan Tech Scene Outdated? The Migration Challenge
 
-02:09:05 - State of Dev in Morocco 2024 & Final Words
+01:17:04 - Latest AI News: Gemini 3, Claude Opus & More
+
+01:21:13 - The Rise of AI-Native Editors (Cursor, Gravity)
+
+01:25:27 - Recent Security Incidents: NPM Supply Chain Attacks
+
+01:31:10 - Guest's Side Project: An AI-Powered Content Automation Platform
+
+01:37:07 - How AI Accelerates Building Side Projects and MVPs
+
+01:41:29 - Are Coding Schools Like 1337 & YouCode Worth It?
+
+01:50:14 - Are Self-Hosted PaaS (like Coolify) Ready for Production?
+
+01:55:55 - An Update on Quantum Computing
+
+01:58:35 - Is UML Still Relevant Today?
+
+02:03:59 - Is Vacation a Solution or an Escape from Burnout?
+
+02:09:08 - Announcing the State of Dev in Morocco 2024 Survey
 
 ## Links
 
