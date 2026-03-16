@@ -37,7 +37,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "@rive-app/canvas": "^2.27.1",
     "@types/node": "^22.15.3",
-    "ai": "^5.0.24",
+    "ai": "^5.0.52",
     "astro": "^5.13.3",
     "astro-cloudinary": "^1.3.2",
     "astro-icon": "^1.1.5",
