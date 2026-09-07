@@ -13,19 +13,25 @@ jobs:
       github.event.workflow_run.event == 'pull_request'
     permissions:
       pull-requests: write
+      actions: read
     steps:
-      - name: Download PR number artifact
-        uses: dawidd6/action-download-artifact@v4
+      - name: Download PR validation artifact
+        uses: actions/download-artifact@v4
         with:
-          workflow: ${{ github.event.workflow_run.workflow_id }}
           name: pr-validation-data
           path: pr
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get PR number
         id: pr
         run: |
-          number=$(cat pr/NR)
-          echo "::set-output name=number::$number"
+          number=$(tr -cd '0-9' < pr/NR | head -c 10)
+          if [ -z "$number" ]; then
+            echo "::error::PR number artifact is not numeric"
+            exit 1
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
 
       - name: Create comment
         uses: marocchino/sticky-pull-request-comment@v2
