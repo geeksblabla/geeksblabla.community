@@ -54,7 +54,7 @@ In this episode of GeeksBlabla, we invited Moroccan Googlers Karima, Rachid, Meh
 
 - [Google Career](https://careers.google.com/)
 
-- [Grokking the System Design Interview](https://www.educative.io/courses/grokking-the-system-design-interview)
+- [Grokking the System Design Interview](https://www.designgurus.io/course/grokking-the-system-design-interview)
 
 - [Introducing Non-Abstract Large System Design](https://sre.google/workbook/non-abstract-design/)
 
